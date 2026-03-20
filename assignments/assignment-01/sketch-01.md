@@ -37,7 +37,7 @@ Rendering is requested by the thread running the main loop when calling `view.re
 - If painting is done while the view model is udpated, we can have races
 - To avoid this, `view.render` is implemented with a synchronous behaviour, so that it returns only when the rendering has been completed, before computing the next state and view model 
   - the solution adopts a monitor (`RenderSynch`), used to synchronize the EDT with the thread requesting repainting
-  - more efficient approaches can be adopted, such as [double buffering](https://en.wikipedia.org/wiki/Multiple_buffering).
+  - more efficient approaches can be adopted, such as [double buffering](https://en.wikipedia.org/wiki/Multiple_buffering)
 
 ### About Scale
 

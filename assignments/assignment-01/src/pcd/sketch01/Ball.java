@@ -1,5 +1,8 @@
 package pcd.sketch01;
 
+import pcd.mainApplicationAssignmentOne.util.P2d;
+import pcd.mainApplicationAssignmentOne.util.V2d;
+
 public class Ball {
     
     private P2d pos;

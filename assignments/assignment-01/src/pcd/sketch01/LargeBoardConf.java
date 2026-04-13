@@ -3,6 +3,9 @@ package pcd.sketch01;
 import java.util.ArrayList;
 import java.util.List;
 
+import pcd.mainApplicationAssignmentOne.util.P2d;
+import pcd.mainApplicationAssignmentOne.util.V2d;
+
 public class LargeBoardConf implements BoardConf {
 
 	@Override

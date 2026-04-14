@@ -13,9 +13,9 @@ public class MonitorUpdateBallsDumb implements MonitorUpdateBalls{
 
     @Override
     public void updatePositionBall(int ballNumber, double x, double y) {
-
         this.ballsOnBoard.get(ballNumber).updateState(x,y);
         System.out.println("\nball number: "+ballNumber+"    "+this.ballsOnBoard.get(ballNumber).getState());
+
     }
 
     

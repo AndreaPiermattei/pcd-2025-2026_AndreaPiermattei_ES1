@@ -1,8 +1,8 @@
-package pcd.sketch01;
+package pcd.mainApplicationAssignmentOne.model.board;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 

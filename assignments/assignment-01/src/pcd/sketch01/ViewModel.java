@@ -2,6 +2,7 @@ package pcd.sketch01;
 
 import java.util.ArrayList;
 
+import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 
 record BallViewInfo(P2d pos, double radius) {}

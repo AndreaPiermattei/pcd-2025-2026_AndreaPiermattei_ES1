@@ -1,6 +1,8 @@
-package pcd.sketch01;
+package pcd.mainApplicationAssignmentOne.model.board;
 
 import java.util.List;
+
+import pcd.mainApplicationAssignmentOne.model.Ball;
 
 public interface BoardConf {
 

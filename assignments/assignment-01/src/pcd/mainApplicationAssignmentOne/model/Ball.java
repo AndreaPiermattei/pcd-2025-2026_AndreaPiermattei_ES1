@@ -1,5 +1,7 @@
-package pcd.sketch01;
+package pcd.mainApplicationAssignmentOne.model;
 
+import pcd.mainApplicationAssignmentOne.model.board.Board;
+import pcd.mainApplicationAssignmentOne.model.board.Boundary;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 

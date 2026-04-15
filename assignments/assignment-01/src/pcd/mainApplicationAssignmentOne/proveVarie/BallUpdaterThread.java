@@ -8,8 +8,6 @@ public class BallUpdaterThread extends Thread{
     private final int indexFirstBall;
     private final int indexLastBall;
     private int currentBallIndex;
-    private double stupidValue;
-
     private Random rand;
 
 
@@ -19,7 +17,6 @@ public class BallUpdaterThread extends Thread{
 
         rand = new Random(numberOfThread);
         this.monitorParallelUpdateBall = monitorInput;
-        this.stupidValue = numberOfThread*1.0;
         this.setName(nameOfThread+numberOfThread);
         this.indexFirstBall=indexFirstBall;
         this.indexLastBall=indexLastBall;
@@ -44,7 +41,7 @@ public class BallUpdaterThread extends Thread{
                 currentBallIndex = indexFirstBall; //refactor: one line version
             
             System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
-            monitorParallelUpdateBall.updatePositionBall(currentBallIndex, stupidValue, stupidValue);
+            monitorParallelUpdateBall.updatePositionBall(currentBallIndex);
             System.out.println("thread "+this.getName()+" DONE!\n");
             currentBallIndex+=1;
             sleepFor(200);

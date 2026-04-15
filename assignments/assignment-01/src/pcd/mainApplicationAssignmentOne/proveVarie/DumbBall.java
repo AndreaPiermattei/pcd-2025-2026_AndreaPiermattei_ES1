@@ -17,10 +17,10 @@ public class DumbBall {
         return stateDumb;
     }
 
-    public void updateState(final double x, final double y){
+    public void updateState(){
 
-        this.x = x;
-        this.y = y;
+        this.x = 5;
+        this.y = 7;
         this.stateDumb = !this.stateDumb;
 
      }

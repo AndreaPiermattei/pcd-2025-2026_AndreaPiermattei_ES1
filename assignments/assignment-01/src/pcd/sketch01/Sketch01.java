@@ -2,6 +2,8 @@ package pcd.sketch01;
 
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.model.board.Board;
+import pcd.mainApplicationAssignmentOne.model.board.LargeBoardConf;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 
 public class Sketch01 {
@@ -16,9 +18,9 @@ public class Sketch01 {
 		 * - massive: 4500 small balls 
 		 */
 		
-		var boardConf = new MinimalBoardConf();
-		// var boardConf = new LargeBoardConf();
-		// var boardConf = new MassiveBoardConf();
+		//var boardConf = new MinimalBoardConf();
+		var boardConf = new LargeBoardConf();
+		//var boardConf = new MassiveBoardConf();
 		
 		Board board = new Board();
 		board.init(boardConf);
@@ -45,8 +47,8 @@ public class Sketch01 {
 			/* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
 
 			if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
-				var angle = rand.nextDouble()*Math.PI*0.25;
-				var v = new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
+				var angle = rand.nextDouble() * Math.PI * 0.25;
+				var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
 				pb.kick(v);
 				lastKickTime = System.currentTimeMillis();
 			}

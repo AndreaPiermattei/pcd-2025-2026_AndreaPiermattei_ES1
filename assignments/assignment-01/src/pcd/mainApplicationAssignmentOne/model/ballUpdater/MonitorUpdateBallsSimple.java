@@ -1,23 +1,21 @@
 package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
-import java.util.List;
-
-import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
-    private final List<Ball> ballsOnBoard;
     private final Board board;
 
-    public MonitorUpdateBallsSimple(List<Ball> ballsOnBoard, Board board) {
-        this.ballsOnBoard = ballsOnBoard;
+    public MonitorUpdateBallsSimple( Board board) {
+
         this.board = board;
     }
 
     @Override
     public void updateBall(long dt, int ballNumber) {
-        this.ballsOnBoard.get(ballNumber).updateState(dt, board);
+        System.out.println("    -updating ball N."+ballNumber);
+        this.board.getBalls().get(ballNumber).updateState(dt, board);
+        System.out.println("    +updated ball N."+ballNumber+"\n position-> "+this.board.getBalls().get(ballNumber).getPos());
     }
     
 }

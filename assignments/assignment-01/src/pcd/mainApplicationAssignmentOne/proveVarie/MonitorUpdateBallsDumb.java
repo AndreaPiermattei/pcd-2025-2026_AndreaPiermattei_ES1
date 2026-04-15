@@ -3,6 +3,8 @@ package pcd.mainApplicationAssignmentOne.proveVarie;
 import java.util.ArrayList;
 import java.util.List;
 
+import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
+
 public class MonitorUpdateBallsDumb implements MonitorUpdateBalls{
 
     private List<DumbBall> ballsOnBoard;
@@ -12,7 +14,7 @@ public class MonitorUpdateBallsDumb implements MonitorUpdateBalls{
     }
 
     @Override
-    public void updatePositionBall(int ballNumber) {
+    public void updateBall(long dt,int ballNumber) {
         this.ballsOnBoard.get(ballNumber).updateState();
         System.out.println("\nball number: "+ballNumber+"    "+this.ballsOnBoard.get(ballNumber).getState());
 

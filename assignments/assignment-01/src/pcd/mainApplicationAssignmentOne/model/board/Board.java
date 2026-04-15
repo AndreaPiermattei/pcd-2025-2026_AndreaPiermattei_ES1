@@ -5,9 +5,9 @@ import pcd.mainApplicationAssignmentOne.model.Ball;
 
 public class Board {
 
-    private List<Ball> balls;    
-    private Ball playerBall;
-    private Boundary bounds;
+    protected List<Ball> balls;    
+    protected Ball playerBall;
+    protected Boundary bounds;
     
     public Board(){} 
     

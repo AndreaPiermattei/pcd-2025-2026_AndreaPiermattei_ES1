@@ -5,6 +5,8 @@ import java.util.Random;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.model.board.LargeBoardConf;
 import pcd.mainApplicationAssignmentOne.util.V2d;
+import pcd.mainApplicationAssignmentOne.view.View;
+import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
 public class Sketch01 {
 

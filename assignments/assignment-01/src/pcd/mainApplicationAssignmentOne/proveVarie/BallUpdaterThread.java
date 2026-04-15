@@ -2,6 +2,8 @@ package pcd.mainApplicationAssignmentOne.proveVarie;
 
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
+
 public class BallUpdaterThread extends Thread{
 
     
@@ -41,7 +43,7 @@ public class BallUpdaterThread extends Thread{
                 currentBallIndex = indexFirstBall; //refactor: one line version
             
             System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
-            monitorParallelUpdateBall.updatePositionBall(currentBallIndex);
+            monitorParallelUpdateBall.updateBall(0,currentBallIndex);
             System.out.println("thread "+this.getName()+" DONE!\n");
             currentBallIndex+=1;
             sleepFor(200);

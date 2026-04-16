@@ -59,7 +59,13 @@ public class MainAppAssignmentOne {
         System.out.println("DONE - CREATING BALL UPDATERS");
         return listOfThreads;
     }
+    private static List<Thread> createOneUpdater(final Board board, final MonitorUpdateBalls monitor){
 
+        List<Thread> list = new ArrayList<>();
+        list.add(new BallUpdater("ONLY THREAD", monitor, 0, board.getBalls().size()-1));
+        return list;
+        
+    }
     private static void launchUpdaters(List<Thread> threads){
         
         if(threads.isEmpty()) throw new IllegalArgumentException("no threads were given: EMPTHY LIST");
@@ -108,7 +114,7 @@ public class MainAppAssignmentOne {
 		var rand = new Random(2);
 		
         try{
-            launchUpdaters(createBallUpdaters(board, monitor));
+            launchUpdaters(createOneUpdater(board, monitor));
         }catch(Exception e){
             System.err.println(e);
             System.exit(1);
@@ -119,6 +125,7 @@ public class MainAppAssignmentOne {
 		View view = new View(viewModel, 1200, 800);
         viewModel.update(board, 0);			
 		view.render();
+        timer.updateTime();	
         waitAbit();
         System.out.println("BEGIN!");
         while (true){			

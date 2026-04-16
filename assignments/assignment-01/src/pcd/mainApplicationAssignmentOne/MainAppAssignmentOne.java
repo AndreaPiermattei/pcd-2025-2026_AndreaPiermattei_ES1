@@ -17,6 +17,8 @@ import pcd.mainApplicationAssignmentOne.proveVarie.BallUpdaterThread;
 import pcd.mainApplicationAssignmentOne.proveVarie.DumbBall;
 import pcd.mainApplicationAssignmentOne.proveVarie.MonitorUpdateBallsDumb;
 import pcd.mainApplicationAssignmentOne.util.V2d;
+import pcd.mainApplicationAssignmentOne.util.timeMenager.TimeMenager;
+import pcd.mainApplicationAssignmentOne.util.timeMenager.TimeMenagerImpl;
 import pcd.mainApplicationAssignmentOne.view.View;
 import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
@@ -24,7 +26,7 @@ public class MainAppAssignmentOne {
 
     private static void waitAbit() {
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(3000);
 		} catch (Exception ex) {}
 	}
 
@@ -41,7 +43,7 @@ public class MainAppAssignmentOne {
                                                                     numberOfProcessors+1);
         final var sizeBallListForThread = (numberOfBallsOnBoard < numberOfProcessors ?
                                                                     1 : 
-                                                                    (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
+                                                                    (numberOfBallsOnBoard/(numberOfBallUpdaters)));
         System.out.println("    -N. threads to create: " + numberOfBallUpdaters);
         System.out.println("    -N. of balls for each thread: " + sizeBallListForThread);
         
@@ -60,7 +62,7 @@ public class MainAppAssignmentOne {
 
     private static void launchUpdaters(List<Thread> threads){
         
-        if(threads.isEmpty()) throw new IllegalArgumentException("no threads were given");
+        if(threads.isEmpty()) throw new IllegalArgumentException("no threads were given: EMPTHY LIST");
         
         for(int i=0; i<threads.size();i++){
             threads.get(i).start();
@@ -89,31 +91,36 @@ public class MainAppAssignmentOne {
 
         //--------------------
 
-        Board board = new BoardSimple();
+        BoardSimple board = new BoardSimple();
 		board.init(new LargeBoardConf());
-        MonitorUpdateBalls monitor = new MonitorUpdateBallsSimple(board);
+        TimeMenager timer = new TimeMenagerImpl();
+        timer.init();
+
+        MonitorUpdateBalls monitor = new MonitorUpdateBallsSimple(board,timer);
         //createBallUpdaters(board, monitor);
+        
+       // int nFrames = 0;
+		//long t0 = System.currentTimeMillis();
+        var lastKickTime = System.currentTimeMillis();
+		//long lastUpdateTime = System.currentTimeMillis();
+			
+		var pb = board.getPlayerBall();
+		var rand = new Random(2);
+		
         try{
             launchUpdaters(createBallUpdaters(board, monitor));
         }catch(Exception e){
             System.err.println(e);
             System.exit(1);
         }
-        
+		waitAbit();
+
         ViewModel viewModel = new ViewModel();
 		View view = new View(viewModel, 1200, 800);
         viewModel.update(board, 0);			
 		view.render();
-		waitAbit();
-
-        int nFrames = 0;
-		long t0 = System.currentTimeMillis();
-		long lastUpdateTime = System.currentTimeMillis();
-			
-		var pb = board.getPlayerBall();
-		var rand = new Random(2);
-		var lastKickTime = t0;
-        
+        waitAbit();
+        System.out.println("BEGIN!");
         while (true){			
 		
 			/* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
@@ -127,20 +134,21 @@ public class MainAppAssignmentOne {
 			
 			/* update board state */
 			
-			long elapsed = System.currentTimeMillis() - lastUpdateTime;
-			lastUpdateTime = System.currentTimeMillis();			
-			board.updateState(elapsed);
+			//long elapsed = System.currentTimeMillis() - lastUpdateTime;
+			//lastUpdateTime = System.currentTimeMillis();	
+            timer.updateTime();		
+			board.updateState(timer.getTimeElapsed());
 			
 			/* render */
 			
-			nFrames++;
-			int framePerSec = 0;
-			long dt = (System.currentTimeMillis() - t0);
-			if (dt > 0) {
-				framePerSec = (int)(nFrames*1000/dt);
-			}
+			//nFrames++;
+			//int framePerSec = 0;
+			//long dt = (System.currentTimeMillis() - t0);
+			//if (dt > 0) {
+			//	framePerSec = (int)(nFrames*1000/dt);
+			//}
 
-			viewModel.update(board, framePerSec);			
+			viewModel.update(board, timer.getFramePerSec());			
 			view.render();
 			
 		}

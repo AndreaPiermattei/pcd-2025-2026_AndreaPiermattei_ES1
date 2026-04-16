@@ -7,12 +7,14 @@ public class BallUpdater extends Thread{
     private final int indexLastBall;
     private int currentBallIndex;
 
+
     public BallUpdater(final String nameThread, final MonitorUpdateBalls monitorParallelUpdateBall, final int indexFirstBall, final int indexLastBall) {
         this.setName(nameThread);
         this.monitorParallelUpdateBall = monitorParallelUpdateBall;
         this.indexFirstBall = indexFirstBall;
         this.indexLastBall = indexLastBall;
         this.currentBallIndex = indexFirstBall;
+
 
         System.out.println(this.getName()+" created with range: "+this.indexFirstBall+" - "+this.indexLastBall);
     }
@@ -27,13 +29,14 @@ public class BallUpdater extends Thread{
     
     public void run() {
 		while (true) {
-        
             if(this.currentBallIndex > this.indexLastBall)
                 this.currentBallIndex = this.indexFirstBall;
 
+            long dt = this.monitorParallelUpdateBall.getTimeElapsed();
+
             System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
-            sleepFor(50); 
-            monitorParallelUpdateBall.updateBall(0,currentBallIndex);
+            this.monitorParallelUpdateBall.updateBall(dt,currentBallIndex);
+            this.monitorParallelUpdateBall.resolveCollisionWithPlayerBall(dt, currentBallIndex);
             System.out.println("thread "+this.getName()+" DONE!\n");
             currentBallIndex+=1;
 		}		

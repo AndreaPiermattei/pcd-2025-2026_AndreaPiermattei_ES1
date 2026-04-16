@@ -20,5 +20,16 @@ public class MonitorUpdateBallsDumb implements MonitorUpdateBalls{
 
     }
 
+    @Override
+    public void resolveCollisionWithPlayerBall(final long dt,final int ballNumber) {
+        throw new UnsupportedOperationException("Unimplemented method 'resolveCollisionWithPlayerBall'");
+    }
+
+    @Override
+    public long getTimeElapsed() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTimeElapsed'");
+    }
+
     
 }

@@ -16,7 +16,7 @@ public class TimeMenagerImpl implements TimeMenager{
     }
 
     @Override
-    public void updateTime() {
+    public synchronized void updateTime() {
         this.elapsed = System.currentTimeMillis() - lastUpdateTime;
         lastUpdateTime = System.currentTimeMillis();
 

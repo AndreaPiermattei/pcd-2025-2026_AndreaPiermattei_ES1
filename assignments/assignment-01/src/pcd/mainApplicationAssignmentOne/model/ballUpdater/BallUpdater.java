@@ -36,7 +36,7 @@ public class BallUpdater extends Thread{
 
             System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
             this.monitorParallelUpdateBall.updateBall(dt,currentBallIndex);
-            this.monitorParallelUpdateBall.resolveCollisionWithPlayerBall(dt, currentBallIndex);
+            //this.monitorParallelUpdateBall.resolveCollisionWithPlayerBall(dt, currentBallIndex);
             System.out.println("thread "+this.getName()+" DONE!\n");
             currentBallIndex+=1;
 		}		

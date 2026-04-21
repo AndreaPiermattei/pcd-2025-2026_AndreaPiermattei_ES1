@@ -60,10 +60,13 @@ public class MainLoop extends Thread{
         
     }
 
+
     private void launchUpdaters(List<Thread> threads){
         
         if(threads.isEmpty()) throw new IllegalArgumentException("no threads were given: EMPTHY LIST");
         
+
+
         for(int i=0; i<threads.size();i++){
             threads.get(i).start();
         }
@@ -87,7 +90,9 @@ public class MainLoop extends Thread{
     public void run(){
         
         try{
-            //launchUpdaters(createOneUpdater(board, monitor));
+            //var threadsCreated = createBallUpdaters(board, monitor);
+            //this.monitor.createTurnsOfUpdaters(threadsCreated.size());
+            //launchUpdaters(threadsCreated);
         }catch(Exception e){
             System.err.println(e);
             System.exit(1);
@@ -119,16 +124,20 @@ public class MainLoop extends Thread{
 			board.updateState(elapsed);
 			
 			/* render */
-			
-			nFrames++;
-			int framePerSec = 0;
-			long dt = (System.currentTimeMillis() - t0);
-			if (dt > 0) {
-				framePerSec = (int)(nFrames*1000/dt);
-			}
+			if(this.monitor.isTimeToRender()){
+                nFrames++;
+                int framePerSec = 0;
+                long dt = (System.currentTimeMillis() - t0);
+                if (dt > 0) {
+                    framePerSec = (int)(nFrames*1000/dt);
+                }
 
-			viewModel.update(board, framePerSec);			
-			view.render();
+                viewModel.update(board, framePerSec);			
+                view.render();
+
+                this.monitor.beginUpdatePhase();
+            }
+			
         }
 
     }

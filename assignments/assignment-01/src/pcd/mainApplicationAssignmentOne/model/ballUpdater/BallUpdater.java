@@ -7,9 +7,11 @@ public class BallUpdater extends Thread{
     private final int indexLastBall;
     private int currentBallIndex;
     private boolean gameInProgress = true;
+    private final int idThread;
 
     public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final int indexFirstBall, final int indexLastBall) {
         this.setName("Updater_N."+numberThread);
+        this.idThread = numberThread;
         this.monitorParallelUpdateBall = monitorParallelUpdateBall;
         this.indexFirstBall = indexFirstBall;
         this.indexLastBall = indexLastBall;
@@ -34,6 +36,9 @@ public class BallUpdater extends Thread{
                 System.out.println("thread "+this.getName()+" DONE!\n");
                 currentBallIndex+=1;
             }else{
+                this.monitorParallelUpdateBall.timeToStop(this.idThread);
+                this.monitorParallelUpdateBall.waitForUpdatePhase(this.idThread);
+                
                 this.currentBallIndex = this.indexFirstBall;
             }
 		}		

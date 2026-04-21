@@ -6,6 +6,7 @@ import java.util.Random;
 
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
+import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.model.board.BoardConf;
 import pcd.mainApplicationAssignmentOne.model.board.LargeBoardConf;
@@ -19,6 +20,7 @@ public class MainLoop extends Thread{
     private Board board = new Board();
     private ViewModel viewModel = new ViewModel();
 	private View view = new View(viewModel, 1200, 800);
+    private MonitorUpdateBalls monitor;
 
     private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitor){
        
@@ -40,9 +42,9 @@ public class MainLoop extends Thread{
         List<Thread> listOfThreads = new ArrayList<>();
         int firstball = 0;
         for(int i = 0; i<numberOfBallUpdaters; i++){
-            var nameOfThread = "BallUpdater N-"+(i+1);
+
             var lastBall = ((firstball+sizeBallListForThread-1 >= numberOfBallsOnBoard) ? (numberOfBallsOnBoard-1) : (firstball+sizeBallListForThread-1));
-            listOfThreads.add(new BallUpdater(nameOfThread, monitor, firstball, lastBall));
+            listOfThreads.add(new BallUpdater(i, monitor, firstball, lastBall));
             firstball+=sizeBallListForThread;
         }
 
@@ -53,7 +55,7 @@ public class MainLoop extends Thread{
     private List<Thread> createOneUpdater(final Board board, final MonitorUpdateBalls monitor){
 
         List<Thread> list = new ArrayList<>();
-        list.add(new BallUpdater("ONLY THREAD", monitor, 0, board.getBalls().size()-1));
+        list.add(new BallUpdater(0, monitor, 0, board.getBalls().size()-1));
         return list;
         
     }
@@ -73,6 +75,7 @@ public class MainLoop extends Thread{
         this.board.init(boardConf);
         this.viewModel.update(board, 0);			
 		this.view.render();
+        this.monitor = new MonitorUpdateBallsSimple(this.board);
     }
 
     private void waitAbit() {
@@ -82,15 +85,7 @@ public class MainLoop extends Thread{
 	}
 
     public void run(){
-        System.out.println("BEGIN GAME");
-		int nFrames = 0;
-		long t0 = System.currentTimeMillis();
-		long lastUpdateTime = System.currentTimeMillis();
-			
-		var pb = board.getPlayerBall();
-		var rand = new Random(2);
-		var lastKickTime = t0;
-
+        
         try{
             //launchUpdaters(createOneUpdater(board, monitor));
         }catch(Exception e){
@@ -99,6 +94,14 @@ public class MainLoop extends Thread{
         }
 		waitAbit();
 
+        int nFrames = 0;
+		long t0 = System.currentTimeMillis();
+		long lastUpdateTime = System.currentTimeMillis();
+			
+		var pb = board.getPlayerBall();
+		var rand = new Random(2);
+		var lastKickTime = t0;
+        System.out.println("BEGIN GAME");
         while(true){
 
             if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
@@ -111,7 +114,8 @@ public class MainLoop extends Thread{
 			/* update board state */
 			
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
-			lastUpdateTime = System.currentTimeMillis();			
+			lastUpdateTime = System.currentTimeMillis();	
+            this.monitor.updateTime(elapsed);		
 			board.updateState(elapsed);
 			
 			/* render */

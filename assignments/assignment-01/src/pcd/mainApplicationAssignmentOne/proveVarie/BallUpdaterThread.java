@@ -43,7 +43,7 @@ public class BallUpdaterThread extends Thread{
                 currentBallIndex = indexFirstBall; //refactor: one line version
             
             System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
-            monitorParallelUpdateBall.updateBall(0,currentBallIndex);
+            monitorParallelUpdateBall.updateBall(currentBallIndex);
             System.out.println("thread "+this.getName()+" DONE!\n");
             currentBallIndex+=1;
             sleepFor(200);

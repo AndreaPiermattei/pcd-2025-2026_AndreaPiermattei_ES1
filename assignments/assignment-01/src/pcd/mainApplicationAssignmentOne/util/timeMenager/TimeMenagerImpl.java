@@ -16,16 +16,10 @@ public class TimeMenagerImpl implements TimeMenager{
     }
 
     @Override
-    public synchronized void updateTime() {
+    public void updateTime() {
         this.elapsed = System.currentTimeMillis() - lastUpdateTime;
         lastUpdateTime = System.currentTimeMillis();
 
-        nFrames++;
-        framePerSec = 0;
-        long dt = (System.currentTimeMillis() - t0);
-        if (dt > 0) {
-            framePerSec = (int)(nFrames*1000/dt);
-        }
     }
 
     @Override
@@ -33,11 +27,5 @@ public class TimeMenagerImpl implements TimeMenager{
         return elapsed;
     }
 
-    @Override
-    public int getFramePerSec() {
-        return framePerSec;
-    }
-
-   
     
 }

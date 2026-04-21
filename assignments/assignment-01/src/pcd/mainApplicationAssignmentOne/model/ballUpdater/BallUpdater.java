@@ -6,7 +6,7 @@ public class BallUpdater extends Thread{
     private final int indexFirstBall;
     private final int indexLastBall;
     private int currentBallIndex;
-
+    private boolean gameInProgress = true;
 
     public BallUpdater(final String nameThread, final MonitorUpdateBalls monitorParallelUpdateBall, final int indexFirstBall, final int indexLastBall) {
         this.setName(nameThread);
@@ -28,7 +28,7 @@ public class BallUpdater extends Thread{
     }
     
     public void run() {
-		while (true) {
+		while (gameInProgress) {
             if(this.currentBallIndex > this.indexLastBall)
                 this.currentBallIndex = this.indexFirstBall;
 

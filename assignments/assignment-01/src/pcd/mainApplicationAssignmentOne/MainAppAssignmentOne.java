@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.controller.MainLoop;
 import pcd.mainApplicationAssignmentOne.model.DumbEnemyAI;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
@@ -114,50 +115,23 @@ public class MainAppAssignmentOne {
 		var rand = new Random(2);
 		
         try{
-            launchUpdaters(createOneUpdater(board, monitor));
+            //launchUpdaters(createOneUpdater(board, monitor));
         }catch(Exception e){
             System.err.println(e);
             System.exit(1);
         }
 		waitAbit();
 
-        ViewModel viewModel = new ViewModel();
-		View view = new View(viewModel, 1200, 800);
-        viewModel.update(board, 0);			
-		view.render();
-        timer.updateTime();	
-        waitAbit();
+        //ViewModel viewModel = new ViewModel();
+		//View view = new View(viewModel, 1200, 800);
+        //viewModel.update(board, 0);			
+		//view.render();
+        //timer.updateTime();	
+        //waitAbit();
         System.out.println("BEGIN!");
-        while (true){			
-		
-			/* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
+        
+        MainLoop mainThrad = new MainLoop();
+        mainThrad.start();
 
-			if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
-				var angle = rand.nextDouble() * Math.PI * 0.25;
-				var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
-				pb.kick(v);
-				lastKickTime = System.currentTimeMillis();
-			}
-			
-			/* update board state */
-			
-			//long elapsed = System.currentTimeMillis() - lastUpdateTime;
-			//lastUpdateTime = System.currentTimeMillis();	
-            timer.updateTime();		
-			board.updateState(timer.getTimeElapsed());
-			
-			/* render */
-			
-			//nFrames++;
-			//int framePerSec = 0;
-			//long dt = (System.currentTimeMillis() - t0);
-			//if (dt > 0) {
-			//	framePerSec = (int)(nFrames*1000/dt);
-			//}
-
-			viewModel.update(board, timer.getFramePerSec());			
-			view.render();
-			
-		}
     }
 }

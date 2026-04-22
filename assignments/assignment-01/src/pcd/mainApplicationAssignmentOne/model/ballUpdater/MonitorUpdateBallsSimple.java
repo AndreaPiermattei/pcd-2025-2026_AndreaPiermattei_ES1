@@ -5,7 +5,6 @@ import java.util.List;
 
 import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
-import pcd.mainApplicationAssignmentOne.model.board.BoardSimple;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
@@ -33,16 +32,12 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
     @Override
     public void updateBall(final int ballNumber) {
-        //System.out.println("    -updating ball N."+ballNumber+"----dt:"+this.dt);
         this.board.getBalls().get(ballNumber).updateState(this.dt, board);
-        //System.out.println("    +updated ball N."+ballNumber+"\n position-> "+this.board.getBalls().get(ballNumber).getPos());
     }
 
     @Override
     public synchronized void resolveCollisionWithPlayerBall(final int ballNumber) {
-        //System.out.println("    -checking collision with ball N."+ballNumber);
         Ball.resolveCollision(this.board.getPlayerBall(), this.board.getBalls().get(ballNumber));
-        //System.out.println("    -done collision with ball N."+ballNumber);
 
     }
 

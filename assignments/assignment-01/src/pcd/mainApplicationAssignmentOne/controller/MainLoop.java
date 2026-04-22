@@ -17,7 +17,7 @@ import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
 public class MainLoop extends Thread{
 
-    private BoardConf boardConf = new LargeBoardConf();
+    private BoardConf boardConf = new MassiveBoardConf();
     private Board board = new Board();
     private ViewModel viewModel = new ViewModel();
 	private View view = new View(viewModel, 1200, 800);
@@ -33,7 +33,7 @@ public class MainLoop extends Thread{
 
         final var numberOfBallUpdaters = (numberOfBallsOnBoard < numberOfProcessors ?
                                                                     numberOfBallsOnBoard : 
-                                                                    numberOfProcessors+1);
+                                                                    numberOfProcessors);
         final var sizeBallListForThread = (numberOfBallsOnBoard < numberOfProcessors ?
                                                                     1 : 
                                                                     (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
@@ -124,10 +124,11 @@ public class MainLoop extends Thread{
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();	
             this.monitor.updateTime(elapsed);		
-			board.updateState(elapsed);
+			
 			
 			/* render */
 			if(this.monitor.isTimeToRender()){
+                board.updateState(elapsed);
                 nFrames++;
                 int framePerSec = 0;
                 long dt = (System.currentTimeMillis() - t0);

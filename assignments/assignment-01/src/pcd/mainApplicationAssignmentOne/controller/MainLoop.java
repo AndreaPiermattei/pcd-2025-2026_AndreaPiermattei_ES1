@@ -17,7 +17,7 @@ import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
 public class MainLoop extends Thread{
 
-    private BoardConf boardConf = new MassiveBoardConf();
+    private BoardConf boardConf = new LargeBoardConf();
     private Board board = new Board();
     private ViewModel viewModel = new ViewModel();
 	private View view = new View(viewModel, 1200, 800);
@@ -36,7 +36,7 @@ public class MainLoop extends Thread{
                                                                     numberOfProcessors+1);
         final var sizeBallListForThread = (numberOfBallsOnBoard < numberOfProcessors ?
                                                                     1 : 
-                                                                    (numberOfBallsOnBoard/(numberOfBallUpdaters)));
+                                                                    (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
         System.out.println("    -N. threads to create: " + numberOfBallUpdaters);
         System.out.println("    -N. of balls for each thread: " + sizeBallListForThread);
         

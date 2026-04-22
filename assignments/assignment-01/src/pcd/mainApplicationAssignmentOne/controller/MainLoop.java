@@ -10,13 +10,14 @@ import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimp
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.model.board.BoardConf;
 import pcd.mainApplicationAssignmentOne.model.board.LargeBoardConf;
+import pcd.mainApplicationAssignmentOne.model.board.MassiveBoardConf;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 import pcd.mainApplicationAssignmentOne.view.View;
 import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
 public class MainLoop extends Thread{
 
-    private BoardConf boardConf = new LargeBoardConf();
+    private BoardConf boardConf = new MassiveBoardConf();
     private Board board = new Board();
     private ViewModel viewModel = new ViewModel();
 	private View view = new View(viewModel, 1200, 800);
@@ -89,16 +90,8 @@ public class MainLoop extends Thread{
 
     public void run(){
         
-        try{
-            //var threadsCreated = createBallUpdaters(board, monitor);
-            //this.monitor.createTurnsOfUpdaters(threadsCreated.size());
-            //launchUpdaters(threadsCreated);
-        }catch(Exception e){
-            System.err.println(e);
-            System.exit(1);
-        }
-		waitAbit();
-
+        
+        waitAbit();
         int nFrames = 0;
 		long t0 = System.currentTimeMillis();
 		long lastUpdateTime = System.currentTimeMillis();
@@ -106,6 +99,16 @@ public class MainLoop extends Thread{
 		var pb = board.getPlayerBall();
 		var rand = new Random(2);
 		var lastKickTime = t0;
+        
+        try{
+            var threadsCreated = createBallUpdaters(board, monitor);
+            this.monitor.createTurnsOfUpdaters(threadsCreated.size());
+            launchUpdaters(threadsCreated);
+        }catch(Exception e){
+            System.err.println(e);
+            System.exit(1);
+        }
+		
         System.out.println("BEGIN GAME");
         while(true){
 

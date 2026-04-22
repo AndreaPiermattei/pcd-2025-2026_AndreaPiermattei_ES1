@@ -16,7 +16,7 @@ public class MassiveBoardConf implements BoardConf {
 
 	@Override
 	public List<Ball> getSmallBalls() {		
-		var ballRadius = 0.01;
+		var ballRadius = 0.007;
         var balls = new ArrayList<Ball>();
 
     	for (int row = 0; row < 30; row++) {

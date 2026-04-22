@@ -26,9 +26,9 @@ public class BallUpdater extends Thread{
             System.err.println(ex);
         }
     }
-    
-    public void run() {
-		while (gameInProgress) {
+
+    private void logic(){
+        while (gameInProgress) {
             if(this.currentBallIndex <= this.indexLastBall){
                 System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
                 this.monitorParallelUpdateBall.updateBall(currentBallIndex);
@@ -41,6 +41,24 @@ public class BallUpdater extends Thread{
                 
                 this.currentBallIndex = this.indexFirstBall;
             }
-		}		
+		}	
+    }
+
+    private void logic2(){
+        while(gameInProgress){
+            for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
+                //System.out.println("thread "+this.getName()+" is about to update ball n:"+this.currentBallIndex);
+                this.monitorParallelUpdateBall.updateBall(currentBallIndex);
+                //this.monitorParallelUpdateBall.resolveCollisionWithPlayerBall(dt, currentBallIndex);
+                //System.out.println("thread "+this.getName()+" DONE!\n");
+            }
+            this.monitorParallelUpdateBall.timeToStop(this.idThread);
+            this.monitorParallelUpdateBall.waitForUpdatePhase(this.idThread);
+
+        }
+    }
+    
+    public void run() {
+		logic2();	
 	}
 }

@@ -52,13 +52,13 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
 
     @Override
-    public synchronized void timeToStop(final int numberOfUpdater){
+    public void timeToStop(final int numberOfUpdater){
         this.statesOfUpdaters.get(numberOfUpdater).stopTurn();
         this.numberOfUpdatersDone+=1;
     }
 
     @Override
-    public void waitForUpdatePhase(final int numberOfUpdater){
+    public synchronized void waitForUpdatePhase(final int numberOfUpdater){
         while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn()){
             try {
                 wait();

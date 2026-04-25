@@ -9,23 +9,43 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
 
-import pcd.mainApplicationAssignmentOne.RenderSynch;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class ViewFrame extends JFrame {
+import pcd.mainApplicationAssignmentOne.RenderSynch;
+import pcd.mainApplicationAssignmentOne.controller.KickBallCmd;
+import pcd.mainApplicationAssignmentOne.controller.MainLoop;
+import pcd.mainApplicationAssignmentOne.controller.SimplePrintCmd;
+
+
+public class ViewFrame extends JFrame implements KeyListener{
     
     private VisualiserPanel panel;
     private ViewModel model;
     private RenderSynch sync;
-    
-    public ViewFrame(ViewModel model, int w, int h){
+
+	//new code for input handling
+	private MainLoop activeController;
+	//end new code
+	
+    public ViewFrame(ViewModel model, int w, int h){ //da cancellare
     	this.model = model;
+		this.activeController = null;
     	this.sync = new RenderSynch();
-    	setTitle("Sketch 03");
+    	setTitle("GAME");
         setSize(w,h + 25);
         setResizable(false);
         panel = new VisualiserPanel(w,h);
         getContentPane().add(panel);
-        addWindowListener(new WindowAdapter(){
+        /* new code */
+
+		this.addKeyListener(this);
+		setFocusable(true);
+		setFocusTraversalKeysEnabled(false);
+		requestFocusInWindow(); 
+
+		/* end: new code */
+		addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent ev){
 				System.exit(-1);
 			}
@@ -34,6 +54,34 @@ public class ViewFrame extends JFrame {
 			}
 		});
     }
+
+    public ViewFrame(ViewModel model, MainLoop controller, int w, int h){
+    	this.model = model;
+		this.activeController = controller;
+    	this.sync = new RenderSynch();
+    	setTitle("GAME");
+        setSize(w,h + 25);
+        setResizable(false);
+        panel = new VisualiserPanel(w,h);
+        getContentPane().add(panel);
+        /* new code */
+
+		this.addKeyListener(this);
+		setFocusable(true);
+		setFocusTraversalKeysEnabled(false);
+		requestFocusInWindow(); 
+
+		/* end: new code */
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent ev){
+				System.exit(-1);
+			}
+			public void windowClosed(WindowEvent ev){
+				System.exit(-1);
+			}
+		});
+    }
+
      
     public void render(){
 		long nf = sync.nextFrameToRender();
@@ -102,4 +150,29 @@ public class ViewFrame extends JFrame {
         }
         
     }
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		final double speed = 2.0;
+		if (e.getExtendedKeyCode() == KeyEvent.VK_W) {
+			activeController.notifyNewCmd(new KickBallCmd("UP", speed));
+		} else if (e.getExtendedKeyCode() == KeyEvent.VK_A){
+			activeController.notifyNewCmd(new KickBallCmd("LEFT", speed));
+		} else if (e.getExtendedKeyCode() == KeyEvent.VK_D){
+			activeController.notifyNewCmd(new KickBallCmd("RIGHT", speed));
+		} else if (e.getExtendedKeyCode() == KeyEvent.VK_S){
+			activeController.notifyNewCmd(new KickBallCmd("DOWN", speed));
+		} else if (e.getExtendedKeyCode() == KeyEvent.VK_SPACE){
+			activeController.notifyNewCmd(new SimplePrintCmd("test msg ok "));
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+	}
 }

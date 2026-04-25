@@ -5,8 +5,6 @@ import java.util.Optional;
 
 public class BoundedBufferPollImpl<Item> extends AbstractBoundedBuffer<Item>{
 
-
-    
     public BoundedBufferPollImpl(int size) {
 		super.buffer = new LinkedList<Item>();
 		super.maxSize = size;

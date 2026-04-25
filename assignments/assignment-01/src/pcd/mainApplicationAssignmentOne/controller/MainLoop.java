@@ -2,6 +2,7 @@ package pcd.mainApplicationAssignmentOne.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import pcd.mainApplicationAssignmentOne.model.MonitorGameStateImpl;
@@ -9,18 +10,21 @@ import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
-import pcd.mainApplicationAssignmentOne.util.V2d;
+import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
+import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBufferPollImpl;
 import pcd.mainApplicationAssignmentOne.view.View;
 import pcd.mainApplicationAssignmentOne.view.ViewModel;
 
 public class MainLoop extends Thread{
+
+    private BoundedBuffer<Cmd> bufferInputCommands;
 
     private boolean gameInProgress = false;
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
     private MonitorGameStateImpl monitorGame;
     private final ViewModel viewModel = new ViewModel();
-	private final View view = new View(viewModel, 1200, 800);
+	private final View view = new View(viewModel, 1200, 800, this);
 
     private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameStateImpl monitorGame){
        
@@ -34,10 +38,10 @@ public class MainLoop extends Thread{
 
         final var numberOfBallUpdaters = (lessBallsThanProcessors ?
                                             numberOfBallsOnBoard : 
-                                            numberOfProcessors+1);
+                                            numberOfProcessors);
         final var sizeBallListForThread = (lessBallsThanProcessors ?
                                             1 : 
-                                            (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
+                                            (numberOfBallsOnBoard/(numberOfBallUpdaters)));
         System.out.println("    -N. of updaters to create: " + numberOfBallUpdaters+
         "\n    -N. of balls for each thread: " + sizeBallListForThread+"\n");
 
@@ -64,6 +68,8 @@ public class MainLoop extends Thread{
 
     public void initializeGame(){
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
+
+        this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         this.gameInProgress = true;
         this.setName("MAIN THREAD OF GAME");
         this.board.init("L");
@@ -76,6 +82,17 @@ public class MainLoop extends Thread{
 			Thread.sleep(3000);
 		} catch (Exception ex) {}
 	}
+
+
+    public void notifyNewCmd(Cmd cmd) {
+		try {
+			bufferInputCommands.put(cmd);
+            System.out.println("comd found - put in buffer");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 
     public void run(){
         
@@ -104,12 +121,23 @@ public class MainLoop extends Thread{
         System.out.println("BEGIN GAME");
         while(gameInProgress){
 
-            if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
+            try {
+				Optional<Cmd> cmd = bufferInputCommands.poll();
+                if(cmd.isPresent()){
+                    log("new cmd fetched:");
+                    cmd.get().execute(board);
+                }
+				
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+            /*if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
 				var angle = rand.nextDouble() * Math.PI * 0.25;
 				var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
 				pb.kick(v);
 				lastKickTime = System.currentTimeMillis();
-			}
+			}*/
 			
 			/* update board state */
 			
@@ -118,8 +146,7 @@ public class MainLoop extends Thread{
             this.monitorBalls.updateTime(elapsed);
 
             this.board.updatePlayerBall(elapsed);	
-            this.board.updateStateCollisions();
-
+            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
 
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
@@ -143,5 +170,9 @@ public class MainLoop extends Thread{
         }
 
     }
+
+    private void log(String msg) {
+		System.out.println("[ " + System.currentTimeMillis() + "]["+this.getName()+ "]" + msg);
+	}
     
 }

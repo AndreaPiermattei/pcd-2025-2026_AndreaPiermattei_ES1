@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 
+import pcd.mainApplicationAssignmentOne.model.Hole;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
@@ -32,9 +33,17 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
     @Override
     public void updateBall(final int ballNumber) {
-        this.board.getBalls().get(ballNumber).updateState(this.dt, board);
-    }
+        if(this.board.getBalls().get(ballNumber).isAlive()){
+            this.board.getBalls().get(ballNumber).updateState(this.dt, board); 
+            for(int i = 0; i<this.board.getHoles().size();i++){
+                if(Hole.checkCollision(this.board.getBalls().get(ballNumber), this.board.getHoles().get(i))) {
+                    this.board.getBalls().get(ballNumber).kill();
+                }   
+            }
+        }
+        
 
+    }
 
     @Override
     public synchronized void updateTime(final long dt){

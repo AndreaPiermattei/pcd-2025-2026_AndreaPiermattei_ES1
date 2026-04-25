@@ -1,5 +1,8 @@
 package pcd.mainApplicationAssignmentOne.model;
 
+import java.awt.IllegalComponentStateException;
+import java.util.Optional;
+
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.model.board.Boundary;
 import pcd.mainApplicationAssignmentOne.util.P2d;
@@ -7,6 +10,10 @@ import pcd.mainApplicationAssignmentOne.util.V2d;
 
 public class Ball {
     
+    private boolean alive;
+    private final Optional<Integer> player;
+    private Optional<Integer> ballCollidedWith = Optional.empty();
+
     private P2d pos;
     private V2d vel;
     private double radius;
@@ -15,12 +22,25 @@ public class Ball {
     private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
     private static double RESTITUTION_FACTOR = 1; 
 
-    public Ball(P2d pos, double radius, double mass, V2d vel){
-       this.pos = pos;
-       this.radius = radius;
-       this.mass = mass;
-       this.vel = vel;
+    public Ball(P2d pos, double radius, double mass, V2d vel,Optional<Integer> playerNumberOptional){
+        this.player = playerNumberOptional;
+        this.alive = true;
+        this.pos = pos;
+        this.radius = radius;
+        this.mass = mass;
+        this.vel = vel;
     }
+
+    public boolean isAlive(){
+        return this.alive;
+    }
+
+    public void kill(){
+        if(isAlive())
+            this.alive = false;
+        
+    }
+
 
     public void updateState(long dt, Board ctx){
         double speed = vel.abs();
@@ -86,7 +106,11 @@ public class Ball {
          * 
          */
         if (dist < minD && dist > 1e-6)  {
-
+            if(b.getBallCollidedWith().isPresent())
+                a.setBallCollidedWith(b.getBallCollidedWith());
+            if(a.getBallCollidedWith().isPresent())
+                b.setBallCollidedWith(a.getBallCollidedWith());
+        
 	        /* 
 	         * Collision case - what to do:
 	         * 
@@ -139,6 +163,20 @@ public class Ball {
     }
 
     
+    public Optional<Integer> getBallCollidedWith() {
+        return ballCollidedWith;
+    }
+
+    public void setBallCollidedWith(Optional<Integer> ballCollidedWith) {
+        this.ballCollidedWith = ballCollidedWith;
+    }
+
+    
+
+    public Optional<Integer> getPlayer() {
+        return player;
+    }
+
     public P2d getPos(){        
     	return pos;
     }

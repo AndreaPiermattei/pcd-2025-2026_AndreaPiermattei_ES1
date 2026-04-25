@@ -3,6 +3,7 @@ package pcd.mainApplicationAssignmentOne.model.board;
 import java.util.List;
 
 import pcd.mainApplicationAssignmentOne.model.Ball;
+import pcd.mainApplicationAssignmentOne.model.Hole;
 
 public interface BoardConf {
 
@@ -11,4 +12,6 @@ public interface BoardConf {
 	Ball getPlayerBall();
 	
 	List<Ball> getSmallBalls();
+
+	List<Hole> getHoles();
 }

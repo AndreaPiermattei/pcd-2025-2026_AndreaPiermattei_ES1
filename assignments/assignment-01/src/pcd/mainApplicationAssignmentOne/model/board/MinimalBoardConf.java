@@ -3,6 +3,7 @@ package pcd.mainApplicationAssignmentOne.model.board;
 import java.util.ArrayList;
 import java.util.List;
 import pcd.mainApplicationAssignmentOne.model.Ball;
+import pcd.mainApplicationAssignmentOne.model.Hole;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 
@@ -27,5 +28,17 @@ public class MinimalBoardConf implements BoardConf {
 	public Boundary getBoardBoundary() {
         return new Boundary(-1.5,-1.0,1.5,1.0);
 	}
+
+	@Override
+	public List<Hole> getHoles() {
+		var holeRadius = 0.1;
+        var holes = new ArrayList<Hole>();
+		var py =  0.025;
+    	for (int row = 0; row < 20; row++) {
+        	var px = -0.25 + row*0.025;
+        	var hole = new Hole(holeRadius, new P2d(px, py));
+			holes.add(hole);
+    	}		
+    	return holes;	}
 
 }

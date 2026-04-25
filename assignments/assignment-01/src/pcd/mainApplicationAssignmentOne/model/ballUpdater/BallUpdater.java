@@ -35,6 +35,7 @@ public class BallUpdater extends Thread{
             //System.out.println(this.thradNumber+" begin update");
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
                 this.monitorParallelUpdateBall.updateBall(this.currentBallIndex);
+                
             }
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);

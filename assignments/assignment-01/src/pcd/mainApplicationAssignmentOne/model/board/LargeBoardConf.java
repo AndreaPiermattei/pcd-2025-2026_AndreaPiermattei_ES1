@@ -2,8 +2,10 @@ package pcd.mainApplicationAssignmentOne.model.board;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import pcd.mainApplicationAssignmentOne.model.Ball;
+import pcd.mainApplicationAssignmentOne.model.Hole;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 
@@ -11,7 +13,8 @@ public class LargeBoardConf implements BoardConf {
 
 	@Override
 	public Ball getPlayerBall() {
-		return  new Ball(new P2d(0, -0.75), 0.05, 1.5, new V2d(0,0)); 
+		Optional<Integer> numberPlayer = Optional.of(1);
+		return  new Ball(new P2d(0, -0.75), 0.05, 1.5, new V2d(0,0), numberPlayer); 
 	}
 
 	@Override
@@ -23,7 +26,7 @@ public class LargeBoardConf implements BoardConf {
     		for (int col = 0; col < 20; col++) {
         		var px = -0.25 + col*0.025;
         		var py =  row*0.025;
-        		var b = new Ball(new P2d(px, py), ballRadius, 0.25, new V2d(0,0));
+        		var b = new Ball(new P2d(px, py), ballRadius, 0.25, new V2d(0,0),Optional.empty());
             	balls.add(b);    			
     		}
     	}		
@@ -32,5 +35,18 @@ public class LargeBoardConf implements BoardConf {
 
 	public Boundary getBoardBoundary() {
         return new Boundary(-1.5,-1.0,1.5,1.0);
+	}
+
+	@Override
+	public List<Hole> getHoles() {
+		var holeRadius = 0.1;
+        var holes = new ArrayList<Hole>();
+		var py =  0.85;
+    	for (int row = 0; row < 2; row++) {
+        	var px = -0.99 + row*2;
+        	var hole = new Hole(holeRadius, new P2d(px, py));
+			holes.add(hole);
+    	}		
+    	return holes;
 	}
 }

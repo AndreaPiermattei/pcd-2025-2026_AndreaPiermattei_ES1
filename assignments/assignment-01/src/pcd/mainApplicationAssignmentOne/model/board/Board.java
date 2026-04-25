@@ -11,10 +11,33 @@ public class Board {
     
     public Board(){} 
     
-    public void init(BoardConf conf) {
-    	balls = conf.getSmallBalls();    	
-    	playerBall = conf.getPlayerBall(); 
-    	bounds = conf.getBoardBoundary();
+    public void init(final String configurationType) {
+        final BoardConf configurationOfBoard;
+        switch (configurationType) {
+            case "L":
+                System.out.println("LARGE CONFIGURATION SELECTED");
+                configurationOfBoard = new LargeBoardConf();
+                break;
+            
+            case "S":
+                System.out.println("MINIMAL CONFIGURATION SELECTED");
+                configurationOfBoard = new MinimalBoardConf();
+                break;
+
+            case "M":
+                System.out.println("MASSIVE CONFIGURATION SELECTED");
+                configurationOfBoard = new MassiveBoardConf();
+                break;
+        
+            default:
+                System.out.println("SELECTION NOT RECOGNIZED!\n    DEFAULT SELECTED: Large");
+                configurationOfBoard = new LargeBoardConf();
+                break;
+        }
+
+    	balls = configurationOfBoard.getSmallBalls();    	
+    	playerBall = configurationOfBoard.getPlayerBall(); 
+    	bounds = configurationOfBoard.getBoardBoundary();
     }
     
     public void updateState(long dt) {

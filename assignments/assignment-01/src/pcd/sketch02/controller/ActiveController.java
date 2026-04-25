@@ -1,7 +1,7 @@
 package pcd.sketch02.controller;
 
+import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
 import pcd.sketch02.model.Counter;
-import pcd.sketch02.util.BoundedBuffer;
 import pcd.sketch02.util.BoundedBufferImpl;
 
 public class ActiveController extends Thread {

@@ -1,6 +1,9 @@
 package pcd.sketch02.util;
 
 import java.util.LinkedList;
+import java.util.Optional;
+
+import pcd.mainApplicationAssignmentOne.util.buffer.AbstractBoundedBuffer;
 
 /**
  * 
@@ -9,38 +12,18 @@ import java.util.LinkedList;
  * 
  * @param <Item>
  */
-public class BoundedBufferImpl<Item> implements BoundedBuffer<Item> {
+public class BoundedBufferImpl<Item> extends AbstractBoundedBuffer<Item> {
 
-	private LinkedList<Item> buffer;
-	private int maxSize;
-
+	
 	public BoundedBufferImpl(int size) {
-		buffer = new LinkedList<Item>();
-		maxSize = size;
+		super.buffer = new LinkedList<Item>();
+		super.maxSize = size;
 	}
 
-	public synchronized void put(Item item) throws InterruptedException {
-		while (isFull()) {
-			wait();
-		}
-		buffer.addLast(item);
-		notifyAll();
-	}
 
-	public synchronized Item get() throws InterruptedException {
-		while (isEmpty()) {
-			wait();
-		}
-		Item item = buffer.removeFirst();
-		notifyAll();
-		return item;
-	}
-
-	private boolean isFull() {
-		return buffer.size() == maxSize;
-	}
-
-	private boolean isEmpty() {
-		return buffer.size() == 0;
+	@Override
+	public Optional<Item> poll() throws InterruptedException {
+		System.out.println("WARNING! IMPLEMENTATION IS ACTUALLY .get()");
+		return Optional.ofNullable(super.get());
 	}
 }

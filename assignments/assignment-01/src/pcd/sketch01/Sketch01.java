@@ -3,8 +3,6 @@ package pcd.sketch01;
 import java.util.Random;
 
 import pcd.mainApplicationAssignmentOne.model.board.Board;
-import pcd.mainApplicationAssignmentOne.model.board.LargeBoardConf;
-import pcd.mainApplicationAssignmentOne.model.board.MassiveBoardConf;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 import pcd.mainApplicationAssignmentOne.view.View;
 import pcd.mainApplicationAssignmentOne.view.ViewModel;
@@ -14,19 +12,9 @@ public class Sketch01 {
 	
 	public static void main(String[] argv) {
 
-		/* 
-		 * Different board configs to try:
-		 * - minimal: 2 small balls
-		 * - large: 400 small balls
-		 * - massive: 4500 small balls 
-		 */
-		
-		//var boardConf = new MinimalBoardConf();
-		var boardConf = new LargeBoardConf();
-		//var boardConf = new MassiveBoardConf();
 		
 		Board board = new Board();
-		board.init(boardConf);
+		board.init("L");
 		
 		ViewModel viewModel = new ViewModel();
 		View view = new View(viewModel, 1200, 800);

@@ -1,16 +1,19 @@
 package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
+import pcd.mainApplicationAssignmentOne.model.MonitorGameStateImpl;
+
 public class BallUpdater extends Thread{
 
     private final MonitorUpdateBalls monitorParallelUpdateBall;
+    private final MonitorGameStateImpl monitorGame;
     private final int indexFirstBall;
     private final int indexLastBall;
     private int currentBallIndex;
-    private boolean gameInProgress = true;
     private final int idThread;
 
-    public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final int indexFirstBall, final int indexLastBall) {
+    public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final  MonitorGameStateImpl monitorGame, final int indexFirstBall, final int indexLastBall) {
         this.setName("Updater_N."+numberThread);
+        this.monitorGame = monitorGame;
         this.idThread = numberThread;
         this.monitorParallelUpdateBall = monitorParallelUpdateBall;
         this.indexFirstBall = indexFirstBall;
@@ -27,8 +30,8 @@ public class BallUpdater extends Thread{
         }
     }
 
-    private void logicVersion1(){
-        while (gameInProgress) {
+    private void logicVersionNoFor(){
+        while (monitorGame.isGameInProgress()) {
             if(this.currentBallIndex <= this.indexLastBall){
                 this.monitorParallelUpdateBall.updateBall(currentBallIndex);
                 this.currentBallIndex+=1;
@@ -41,8 +44,8 @@ public class BallUpdater extends Thread{
 		}	
     }
 
-    private void logicVersion2(){
-        while(gameInProgress){
+    private void logicVersionWithFor(){
+        while(monitorGame.isGameInProgress()){
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
                 this.monitorParallelUpdateBall.updateBall(this.currentBallIndex);
             }
@@ -53,6 +56,6 @@ public class BallUpdater extends Thread{
     }
     
     public void run() {
-		logicVersion2();	
+		logicVersionWithFor();	
 	}
 }

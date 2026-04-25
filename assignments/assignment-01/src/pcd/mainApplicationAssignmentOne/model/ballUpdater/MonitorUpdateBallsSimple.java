@@ -3,7 +3,6 @@ package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 import java.util.ArrayList;
 import java.util.List;
 
-import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
@@ -35,11 +34,6 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
         this.board.getBalls().get(ballNumber).updateState(this.dt, board);
     }
 
-    @Override
-    public synchronized void resolveCollisionWithPlayerBall(final int ballNumber) {
-        Ball.resolveCollision(this.board.getPlayerBall(), this.board.getBalls().get(ballNumber));
-
-    }
 
     @Override
     public synchronized void updateTime(final long dt){

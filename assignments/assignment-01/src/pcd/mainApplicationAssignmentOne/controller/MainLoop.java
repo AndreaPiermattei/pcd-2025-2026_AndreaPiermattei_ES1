@@ -59,6 +59,7 @@ public class MainLoop extends Thread{
         for(int i=0; i<threads.size();i++){
             threads.get(i).start();
         }
+        System.out.println("updaters Lanched");
     }
 
     public void initializeGame(){
@@ -79,6 +80,10 @@ public class MainLoop extends Thread{
     public void run(){
         
         waitAbit();
+        
+        int nFrames = 0;
+		long t0 = System.currentTimeMillis();
+		long lastUpdateTime = System.currentTimeMillis();
         try{
             final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
@@ -89,11 +94,6 @@ public class MainLoop extends Thread{
             this.monitorGame.stopGame();
             System.exit(1);
         }
-        
-        int nFrames = 0;
-		long t0 = System.currentTimeMillis();
-		long lastUpdateTime = System.currentTimeMillis();
-			
 		var pb = board.getPlayerBall();
 		var rand = new Random(2);
 		var lastKickTime = t0;
@@ -115,13 +115,16 @@ public class MainLoop extends Thread{
 			
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();	
-            this.monitorBalls.updateTime(elapsed);		
-			
-			
+            this.monitorBalls.updateTime(elapsed);
+
+            this.board.updatePlayerBall(elapsed);	
+            this.board.updateStateCollisions();
+
+
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
-
-                board.updateState(elapsed);
+                //System.out.println("not HOLD");
+                
                 nFrames++;
                 int framePerSec = 0;
                 long dt = (System.currentTimeMillis() - t0);
@@ -133,6 +136,8 @@ public class MainLoop extends Thread{
                 view.render();
 
                 this.monitorBalls.beginUpdatePhase();
+            }else{
+                //System.out.println("HOLD");
             }
 			
         }

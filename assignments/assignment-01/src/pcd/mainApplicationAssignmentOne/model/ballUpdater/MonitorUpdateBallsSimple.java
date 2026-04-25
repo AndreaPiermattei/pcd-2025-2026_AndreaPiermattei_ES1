@@ -2,6 +2,7 @@ package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CyclicBarrier;
 
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 
@@ -41,14 +42,16 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
 
     @Override
-    public void timeToStop(final int numberOfUpdater){
+    public synchronized void timeToStop(final int numberOfUpdater){
         this.statesOfUpdaters.get(numberOfUpdater).stopTurn();
         this.numberOfUpdatersDone+=1;
     }
 
     @Override
     public synchronized void waitForUpdatePhase(final int numberOfUpdater){
+        
         while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn()){
+            //System.out.println(numberOfUpdater+"wait");
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -75,7 +78,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
     @Override
     public synchronized boolean isTimeToRender(){
-        return this.totalNumberOfUpdaters >= this.numberOfUpdatersDone;
+        return this.numberOfUpdatersDone == this.totalNumberOfUpdaters;
     }
 
 }

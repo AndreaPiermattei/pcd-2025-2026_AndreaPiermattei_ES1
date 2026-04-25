@@ -42,13 +42,25 @@ public class Board {
     
     public void updateState(long dt) {
 
-    	playerBall.updateState(dt, this);
+    	//playerBall.updateState(dt, this);      	
     	
-    	//for (var b: balls) {
-    	//	b.updateState(dt, this);
-    	//}       	
-    	
-    	for (int i = 0; i < balls.size() - 1; i++) {
+    	/*for (int i = 0; i < balls.size() - 1; i++) {
+            for (int j = i + 1; j < balls.size(); j++) {
+                Ball.resolveCollision(balls.get(i), balls.get(j));
+            }
+        }
+    	for (var b: balls) {
+    		Ball.resolveCollision(playerBall, b);
+    	} */
+    	   	    	
+    }
+
+    public void updatePlayerBall(final long dt){
+        playerBall.updateState(dt, this);
+    }
+
+    public void updateStateCollisions(){
+        for (int i = 0; i < balls.size() - 1; i++) {
             for (int j = i + 1; j < balls.size(); j++) {
                 Ball.resolveCollision(balls.get(i), balls.get(j));
             }
@@ -56,7 +68,6 @@ public class Board {
     	for (var b: balls) {
     		Ball.resolveCollision(playerBall, b);
     	} 
-    	   	    	
     }
     
     public List<Ball> getBalls(){

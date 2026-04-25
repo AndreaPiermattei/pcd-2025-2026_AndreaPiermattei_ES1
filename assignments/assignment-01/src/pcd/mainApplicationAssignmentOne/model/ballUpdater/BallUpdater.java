@@ -9,12 +9,12 @@ public class BallUpdater extends Thread{
     private final int indexFirstBall;
     private final int indexLastBall;
     private int currentBallIndex;
-    private final int idThread;
+    private final int thradNumber;
 
     public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final  MonitorGameStateImpl monitorGame, final int indexFirstBall, final int indexLastBall) {
         this.setName("Updater_N."+numberThread);
         this.monitorGame = monitorGame;
-        this.idThread = numberThread;
+        this.thradNumber = numberThread;
         this.monitorParallelUpdateBall = monitorParallelUpdateBall;
         this.indexFirstBall = indexFirstBall;
         this.indexLastBall = indexLastBall;
@@ -30,28 +30,14 @@ public class BallUpdater extends Thread{
         }
     }
 
-    private void logicVersionNoFor(){
-        while (monitorGame.isGameInProgress()) {
-            if(this.currentBallIndex <= this.indexLastBall){
-                this.monitorParallelUpdateBall.updateBall(currentBallIndex);
-                this.currentBallIndex+=1;
-            }else{
-                this.monitorParallelUpdateBall.timeToStop(this.idThread);
-                this.monitorParallelUpdateBall.waitForUpdatePhase(this.idThread);
-                
-                this.currentBallIndex = this.indexFirstBall;
-            }
-		}	
-    }
-
     private void logicVersionWithFor(){
         while(monitorGame.isGameInProgress()){
+            //System.out.println(this.thradNumber+" begin update");
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
                 this.monitorParallelUpdateBall.updateBall(this.currentBallIndex);
             }
-            this.monitorParallelUpdateBall.timeToStop(this.idThread);
-            this.monitorParallelUpdateBall.waitForUpdatePhase(this.idThread);
-
+            this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
+            this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }
     }
     

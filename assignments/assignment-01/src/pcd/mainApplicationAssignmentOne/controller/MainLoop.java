@@ -19,6 +19,7 @@ public class MainLoop extends Thread{
 
     private BoundedBuffer<Cmd> bufferInputCommands;
 
+    private int scorePlayer = 0;
     private boolean gameInProgress = false;
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
@@ -97,6 +98,7 @@ public class MainLoop extends Thread{
     public void run(){
         
         waitAbit();
+        long startKill = System.currentTimeMillis();
         
         int nFrames = 0;
 		long t0 = System.currentTimeMillis();
@@ -119,7 +121,7 @@ public class MainLoop extends Thread{
 		this.view.render();
 		
         System.out.println("BEGIN GAME");
-        while(gameInProgress){
+        while(this.board.getBalls().stream().filter(ball->ball.isAlive()).toList().size()>0){
 
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
@@ -166,8 +168,26 @@ public class MainLoop extends Thread{
             }else{
                 //System.out.println("HOLD");
             }
+
+
+
+            if(System.currentTimeMillis()-startKill > 15_000){
+                System.out.println("kill all");
+                for(int j = 0; j<this.board.getBalls().size();j++){
+                    this.board.getBalls().get(j).kill();
+                }
+            }
+
+            
 			
         }
+        this.scorePlayer = this.board.getBalls().stream()
+        .filter(elem->!elem.isAlive())
+        .filter(elem->elem.getBallCollidedWith().isPresent())
+        .filter(elem->elem.getBallCollidedWith().get()==1)
+        .toList().size();
+        System.out.println("ALL done "+this.scorePlayer);
+        System.exit(0);
 
     }
 

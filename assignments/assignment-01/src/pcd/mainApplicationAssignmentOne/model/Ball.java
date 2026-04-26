@@ -51,6 +51,7 @@ public class Ball {
             vel = vel.mul(factor);
         } else {
         	vel = new V2d(0,0);
+            setBallCollidedWith(Optional.empty());
         }
         pos = pos.sum(vel.mul(dt_scaled));
      	applyBoundaryConstraints(ctx);
@@ -106,11 +107,12 @@ public class Ball {
          * 
          */
         if (dist < minD && dist > 1e-6)  {
-            if(b.getBallCollidedWith().isPresent())
-                a.setBallCollidedWith(b.getBallCollidedWith());
-            if(a.getBallCollidedWith().isPresent())
-                b.setBallCollidedWith(a.getBallCollidedWith());
-        
+            if(b.getPlayer().isPresent())
+                a.setBallCollidedWith(b.getPlayer());
+            if(a.getPlayer().isPresent())
+                b.setBallCollidedWith(a.getPlayer());
+            
+            
 	        /* 
 	         * Collision case - what to do:
 	         * 

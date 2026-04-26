@@ -119,8 +119,17 @@ public class ViewFrame extends JFrame implements KeyListener{
     		g2.drawLine(ox,0,ox,oy*2);
     		g2.drawLine(0,oy,ox*2,oy);
     		g2.setColor(Color.BLACK);
-    		
+			
+			var countDrawn = 0;
+    		//disegno palline
+			countDrawn+=(model.getBalls().stream().filter(elem->elem.ballCollideWith()
+				.isPresent())
+				.filter(elem->elem.ballCollideWith().get().intValue() == 1)
+				.toList()
+				.size());
+
 			g2.setColor(Color.GREEN);
+			
 			g2.setStroke(new BasicStroke(1));
 			for (var b: model.getBalls().stream().filter(elem->elem.ballCollideWith()
 				.isPresent())
@@ -133,7 +142,10 @@ public class ViewFrame extends JFrame implements KeyListener{
 				int radiusY = (int)(b.radius()*delta);
 				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
 			}
-
+			countDrawn+=model.getBalls().stream().filter(elem->!elem.ballCollideWith()
+				.isPresent())
+				.toList()
+				.size();
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(1));
 			for (var b: model.getBalls().stream().filter(elem->!elem.ballCollideWith()
@@ -146,6 +158,8 @@ public class ViewFrame extends JFrame implements KeyListener{
 				int radiusY = (int)(b.radius()*delta);
 				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
 			}
+
+			//fine disegno palline
 
 			g2.setStroke(new BasicStroke(3));
 			var pb = model.getPlayerBall();
@@ -173,7 +187,7 @@ public class ViewFrame extends JFrame implements KeyListener{
 			g2.setStroke(new BasicStroke(1));
 			g2.drawString("Num small balls: " + model.getBalls().size(), 20, 40);
 			g2.drawString("Frame per sec: " + model.getFramePerSec(), 20, 60);
-
+			g2.drawString("[Num. Balls Actually Drawn: " + countDrawn, 20, 90);
 			sync.notifyFrameRendered();
     		
         }

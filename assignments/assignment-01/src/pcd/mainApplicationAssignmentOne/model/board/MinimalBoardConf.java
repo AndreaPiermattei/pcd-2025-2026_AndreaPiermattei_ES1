@@ -2,6 +2,8 @@ package pcd.mainApplicationAssignmentOne.model.board;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.Hole;
 import pcd.mainApplicationAssignmentOne.util.P2d;
@@ -11,14 +13,15 @@ public class MinimalBoardConf implements BoardConf {
 
 	@Override
 	public Ball getPlayerBall() {
-    	return new Ball(new P2d(0, 0), 0.06, 1, new V2d(0,0.5)); 
+		Optional<Integer> numberPlayer = Optional.of(1);
+    	return new Ball(new P2d(0, 0), 0.06, 1, new V2d(0,0.5),numberPlayer); 
 	}
 
 	@Override
 	public List<Ball> getSmallBalls() {		
         var balls = new ArrayList<Ball>();
-    	var b1 = new Ball(new P2d(0, 0.5), 0.05, 0.75, new V2d(0,0));
-    	var b2 = new Ball(new P2d(0.05, 0.55), 0.025, 0.25, new V2d(0,0));
+    	var b1 = new Ball(new P2d(0, 0.5), 0.05, 0.75, new V2d(0,0),Optional.empty());
+    	var b2 = new Ball(new P2d(0.05, 0.55), 0.025, 0.25, new V2d(0,0),Optional.empty());
     	balls.add(b1);
     	balls.add(b2);
     	return balls;

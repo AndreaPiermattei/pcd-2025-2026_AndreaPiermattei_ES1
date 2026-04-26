@@ -44,7 +44,7 @@ public class Board {
         holes = configurationOfBoard.getHoles();
     }
     
-    public void updateState(long dt) {
+    /*public void updateState(long dt) {
 
     	playerBall.updateState(dt, this);      	
     	
@@ -65,7 +65,7 @@ public class Board {
             }
         }
     	   	    	
-    }
+    }*/
 
     public void updatePlayerBall(final long dt){
         playerBall.updateState(dt, this);

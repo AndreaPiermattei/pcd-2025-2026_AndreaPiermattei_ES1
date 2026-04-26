@@ -107,9 +107,9 @@ public class Ball {
          * 
          */
         if (dist < minD && dist > 1e-6)  {
-            if(b.getPlayer().isPresent())
+            if(b.getPlayer().isPresent() && a.isAlive())
                 a.setBallCollidedWith(b.getPlayer());
-            if(a.getPlayer().isPresent())
+            if(a.getPlayer().isPresent() && b.isAlive())
                 b.setBallCollidedWith(a.getPlayer());
             
             

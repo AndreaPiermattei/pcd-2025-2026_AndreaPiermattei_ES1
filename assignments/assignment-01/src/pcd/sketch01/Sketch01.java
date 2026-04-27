@@ -48,7 +48,8 @@ public class Sketch01 {
 			
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();			
-			board.updateState(elapsed);
+			board.updatePlayerBall(elapsed);
+			board.updateStateCollisions();
 			
 			/* render */
 			

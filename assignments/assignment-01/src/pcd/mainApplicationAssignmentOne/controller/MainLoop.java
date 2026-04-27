@@ -187,7 +187,7 @@ public class MainLoop extends Thread{
         .filter(elem->elem.getBallCollidedWith().get()==1)
         .toList().size();
         System.out.println("ALL done "+this.scorePlayer);
-        System.exit(0);
+        //System.exit(0);
 
     }
 

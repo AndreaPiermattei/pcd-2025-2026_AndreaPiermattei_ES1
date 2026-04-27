@@ -33,8 +33,12 @@ public class KickBallCmd implements Cmd{
 
     @Override
     public void execute(final Board model) {
-        //System.out.println(this.name+" Kick");
+        //simplelog
         model.getPlayerBall().kick(this.directionKick.mul(this.speedfactor));
+    }
+
+    private void simpleLog(){
+        System.out.println(this.name+" Kick executed");
     }
     
 }

@@ -107,7 +107,7 @@ public class Ball {
          * 
          */
         if (dist < minD && dist > 1e-6)  {
-            updateCollisionInfoOfBall(a, b);
+            updateInfoCollisionsOfBalls(a, b);
             
 	        /* 
 	         * Collision case - what to do:
@@ -160,12 +160,12 @@ public class Ball {
         }
     }
 
-    private static void updateCollisionInfoOfBall(Ball a, Ball b) {
-        setBallCollisionInfo(b, a);
-        setBallCollisionInfo(a, b);
+    private static void updateInfoCollisionsOfBalls(Ball a, Ball b) {
+        updateInfoCollision(b, a);
+        updateInfoCollision(a, b);
     }
 
-    private static void setBallCollisionInfo(Ball a, Ball b) {
+    private static void updateInfoCollision(Ball a, Ball b) {
         if(!b.isPlayerBall()&&b.isAlive()){
             if(a.isPlayerBall())
                 b.setBallCollidedWith(a.getPlayer());

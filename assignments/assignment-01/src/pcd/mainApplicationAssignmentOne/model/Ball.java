@@ -107,11 +107,8 @@ public class Ball {
          * 
          */
         if (dist < minD && dist > 1e-6)  {
-            if(b.getPlayer().isPresent() && a.isAlive())
-                a.setBallCollidedWith(b.getPlayer());
-            if(a.getPlayer().isPresent() && b.isAlive())
-                b.setBallCollidedWith(a.getPlayer());
-            
+            setBallCollisionWithPlayer(b, a);
+            setBallCollisionWithPlayer(a, b);
             
 	        /* 
 	         * Collision case - what to do:
@@ -164,6 +161,14 @@ public class Ball {
         }
     }
 
+    private static void setBallCollisionWithPlayer(Ball a, Ball b) {
+        if(!b.isPlayerBall()){
+            if( a.getPlayer().isPresent() && b.isAlive())
+                    b.setBallCollidedWith(a.getPlayer());
+        }
+        
+    }
+
     
     public Optional<Integer> getBallCollidedWith() {
         return ballCollidedWith;
@@ -177,6 +182,10 @@ public class Ball {
 
     public Optional<Integer> getPlayer() {
         return player;
+    }
+
+    public boolean isPlayerBall(){
+        return player.isPresent();
     }
 
     public P2d getPos(){        

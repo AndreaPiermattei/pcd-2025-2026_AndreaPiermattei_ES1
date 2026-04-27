@@ -15,6 +15,17 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     private int numberOfUpdatersDone=0;
     private List<SimpleTurnImpl> statesOfUpdaters;
 
+    @Override
+    public synchronized int calculateScores(){
+        return this.board.getBalls()
+        .stream()
+        .filter(elem->!elem.isAlive())
+        .filter(elem->elem.getBallCollidedWith().isPresent())
+        .filter(elem->elem.getBallCollidedWith().get() == 1)
+        .toList()
+        .size();
+    }
+
     public MonitorUpdateBallsSimple(final Board board2) {
         this.board = board2;
         statesOfUpdaters = new ArrayList<>();

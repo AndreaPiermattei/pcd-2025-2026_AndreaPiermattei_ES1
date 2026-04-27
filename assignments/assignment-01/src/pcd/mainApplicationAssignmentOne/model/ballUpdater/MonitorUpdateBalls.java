@@ -10,4 +10,5 @@ public interface MonitorUpdateBalls {
     public void waitForUpdatePhase(int numberOfUpdater);
     public void beginUpdatePhase();
     public boolean isTimeToRender();
+    public int calculateScores();
 }

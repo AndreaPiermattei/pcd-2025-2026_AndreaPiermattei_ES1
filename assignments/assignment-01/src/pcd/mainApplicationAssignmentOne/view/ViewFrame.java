@@ -105,6 +105,11 @@ public class ViewFrame extends JFrame implements KeyListener{
 			g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
 		}
 	}    
+
+	private int countButDoNotDrawBalls(List<BallViewInfo> listBalls){
+		return listBalls.size();
+	}
+
 	private int drawFromListOfBalls(Graphics2D g2,int ox,int oy,int delta,List<BallViewInfo> listBalls, Color color){
 		
 		g2.setColor(color);	
@@ -115,8 +120,6 @@ public class ViewFrame extends JFrame implements KeyListener{
 
 		return listBalls.size();
 	}
-
-	
 
 	private int drawAliveBallsOfPlayerOne(Graphics2D g2,int ox,int oy,int delta){
 		
@@ -149,29 +152,28 @@ public class ViewFrame extends JFrame implements KeyListener{
 				+drawAliveBallsOfNoPlayer(g2,ox,oy,delta));
 	}
 
-	private int drawKilledBallsByPlayer(Graphics2D g2,int ox,int oy,int delta, int playerNumber){
-		return drawFromListOfBalls(g2, 
-			ox, 
-			oy, 
-			delta,
-			model.getDeadBallsForDebug().
-				stream()
-				.filter(elem->elem.ballCollideWith().isPresent())
-				.filter(elem->elem.ballCollideWith().get().intValue() == playerNumber)
-				.toList(), 
-			Color.PINK);
+	private int drawKilledBallsByPlayer(Graphics2D g2,int ox,int oy,int delta, int playerNumber,boolean debug){
+		
+		var list = model.getDeadBallsForDebug().
+					stream()
+					.filter(elem->elem.ballCollideWith().isPresent())
+					.filter(elem->elem.ballCollideWith().get().intValue() == playerNumber)
+					.toList();
+		
+		if(debug)
+			return drawFromListOfBalls(g2, ox, oy, delta,list, Color.RED);
+
+		return countButDoNotDrawBalls(list);
 	}
 
-	private int drawKilledBallsByNoPlayer(Graphics2D g2,int ox,int oy,int delta){
-		return drawFromListOfBalls(g2, 
-			ox, 
-			oy, 
-			delta,
-			model.getDeadBallsForDebug()
+	private int drawKilledBallsByNoPlayer(Graphics2D g2,int ox,int oy,int delta,boolean debug){
+		var list = model.getDeadBallsForDebug()
 				.stream()
 				.filter(elem->!elem.ballCollideWith().isPresent())
-				.toList(), 
-			Color.BLUE);
+				.toList();
+		if(debug)
+			return drawFromListOfBalls(g2, ox, oy, delta,list, Color.WHITE);
+		return countButDoNotDrawBalls(list);
 	}
 
     public class VisualiserPanel extends JPanel {
@@ -201,91 +203,17 @@ public class ViewFrame extends JFrame implements KeyListener{
     		g2.drawLine(0,oy,ox*2,oy);
     		g2.setColor(Color.BLACK);
 			
+			var countAliveBallsDrawn = drawAliveBalls(g2, ox, oy, delta);
 			
-    		//disegno palline originale: sostituisci con drawAliveBalls
-			/*var countDrawn = 0;
-			countDrawn+=(model.getAliveBalls().stream().filter(elem->elem.ballCollideWith()
-				.isPresent())
-				.filter(elem->elem.ballCollideWith().get().intValue() == 1)
-				.toList()
-				.size());
-
-			g2.setColor(Color.GREEN);
-			g2.setStroke(new BasicStroke(1));
-			for (var b: model.getAliveBalls().stream().filter(elem->elem.ballCollideWith()
-				.isPresent())
-				.filter(elem->elem.ballCollideWith().get().intValue() == 1)
-				.toList()) {
-				var p = b.pos();
-				int x0 = (int)(ox + p.x()*delta);
-				int y0 = (int)(oy - p.y()*delta);
-				int radiusX = (int)(b.radius()*delta);
-				int radiusY = (int)(b.radius()*delta);
-				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
-			}
-			countDrawn+=model.getAliveBalls().stream().filter(elem->!elem.ballCollideWith()
-				.isPresent())
-				.toList()
-				.size();
-			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(1));
-			for (var b: model.getAliveBalls().stream().filter(elem->!elem.ballCollideWith()
-				.isPresent())
-				.toList()) {
-				var p = b.pos();
-				int x0 = (int)(ox + p.x()*delta);
-				int y0 = (int)(oy - p.y()*delta);
-				int radiusX = (int)(b.radius()*delta);
-				int radiusY = (int)(b.radius()*delta);
-				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
-			}*/
-
-			var countDrawn = drawAliveBalls(g2, ox, oy, delta);
-			//--------
-
-			var ballsKilledByPlayer = drawKilledBallsByPlayer(g2, ox, oy, delta, 1);
+			var countBallsKilledByPlayerDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 1,true);
 			
-			//palline uccise dal giocatore 1 originale
-			/*g2.setColor(Color.PINK);
-			g2.setStroke(new BasicStroke(1));
-			for (var b: model.getDeadBallsForDebug().stream().filter(elem->elem.ballCollideWith()
-				.isPresent())
-				.filter(elem->elem.ballCollideWith().get().intValue() == 1)
-				.toList()) {
-				var p = b.pos();
-				int x0 = (int)(ox + p.x()*delta);
-				int y0 = (int)(oy - p.y()*delta);
-				int radiusX = (int)(b.radius()*delta);
-				int radiusY = (int)(b.radius()*delta);
-				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
-			}*/
-
-			var ballsKilledByNoPlayer = drawKilledBallsByNoPlayer(g2, ox, oy, delta);
-
-			/*g2.setColor(Color.BLUE);
-			g2.setStroke(new BasicStroke(1));
-			for (var b: model.getDeadBallsForDebug().stream().filter(elem->!elem.ballCollideWith()
-				.isPresent())
-				.toList()) {
-				var p = b.pos();
-				int x0 = (int)(ox + p.x()*delta);
-				int y0 = (int)(oy - p.y()*delta);
-				int radiusX = (int)(b.radius()*delta);
-				int radiusY = (int)(b.radius()*delta);
-				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
-			}*/
+			var countBallsSelfKilledDrawn = drawKilledBallsByNoPlayer(g2, ox, oy, delta,false);
 
 			//fine disegno palline
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
 			var pb = model.getPlayerBall();
 			if (pb != null) {
-				/*var p1 = pb.pos();
-				int x0 = (int)(ox + p1.x()*delta);
-				int y0 = (int)(oy - p1.y()*delta);
-				int radiusX = (int)(pb.radius()*delta);
-				int radiusY = (int)(pb.radius()*delta);
-				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);*/
 				drawBall(g2, ox, oy, delta, pb);
 			}
 
@@ -305,11 +233,12 @@ public class ViewFrame extends JFrame implements KeyListener{
 			g2.drawString("Num small balls: " + model.getAliveBalls().size(), 20, 40);
 			g2.drawString("Frame per sec: " + model.getFramePerSec(), 20, 60);
 
-			g2.drawString("# Num dead balls: " + model.getDeadBallsForDebug().size(), 20, 80);
-			g2.drawString("# Num. Alive Balls drawn: " + countDrawn, 20, 100);
-			g2.drawString("# Num. killed by no player: " + ballsKilledByNoPlayer, 20, 120);
+			g2.drawString("# Num. Alive Balls drawn: " + countAliveBallsDrawn, 20, 80);
+			g2.drawString("# Num dead balls: " + model.getDeadBallsForDebug().size(), 20, 120);
+			
+			g2.drawString("#---Num. killed by no player: " + countBallsSelfKilledDrawn, 20, 140);
 			sync.notifyFrameRendered();
-			g2.drawString("# Num. killed by player1: " + ballsKilledByPlayer, 20, 140);
+			g2.drawString("#---Num. killed by player1: " + countBallsKilledByPlayerDrawn, 20, 160);
 			sync.notifyFrameRendered();
     		
         }

@@ -88,7 +88,7 @@ public class MainLoop extends Thread{
     public void notifyNewCmd(Cmd cmd) {
 		try {
 			bufferInputCommands.put(cmd);
-            System.out.println("comd found - put in buffer");
+            //System.out.println("comd found - put in buffer");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -98,8 +98,7 @@ public class MainLoop extends Thread{
     public void run(){
         
         waitAbit();
-        long startKill = System.currentTimeMillis();
-        
+        long startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
 		long t0 = System.currentTimeMillis();
 		long lastUpdateTime = System.currentTimeMillis();
@@ -113,33 +112,23 @@ public class MainLoop extends Thread{
             this.monitorGame.stopGame();
             System.exit(1);
         }
-		var pb = board.getPlayerBall();
-		var rand = new Random(2);
-		var lastKickTime = t0;
 
         this.viewModel.update(board, 0);			
 		this.view.render();
 		
         System.out.println("BEGIN GAME");
-        while(this.board.getBalls().stream().filter(ball->ball.isAlive()).toList().size()>0){
+        while(gameInProgress){
 
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
-                    log("new cmd fetched:");
+                    //log("new cmd fetched:");
                     cmd.get().execute(board);
                 }
 				
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-
-            /*if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
-				var angle = rand.nextDouble() * Math.PI * 0.25;
-				var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
-				pb.kick(v);
-				lastKickTime = System.currentTimeMillis();
-			}*/
 			
 			/* update board state */
 			
@@ -150,6 +139,7 @@ public class MainLoop extends Thread{
             this.board.updatePlayerBall(elapsed);	
             this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
 
+            this.scorePlayer = this.monitorBalls.calculateScores();
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
                 //System.out.println("not HOLD");
@@ -169,26 +159,21 @@ public class MainLoop extends Thread{
                 //System.out.println("HOLD");
             }
 
+            debugForceGameOver(startForcedGameOver);
 
-
-            if(System.currentTimeMillis()-startKill > 15_000){
-                System.out.println("kill all");
-                for(int j = 0; j<this.board.getBalls().size();j++){
-                    this.board.getBalls().get(j).kill();
-                }
-            }
-
-            
-			
         }
-        this.scorePlayer = this.board.getBalls().stream()
-        .filter(elem->!elem.isAlive())
-        .filter(elem->elem.getBallCollidedWith().isPresent())
-        .filter(elem->elem.getBallCollidedWith().get()==1)
-        .toList().size();
+        
         System.out.println("ALL done "+this.scorePlayer);
         //System.exit(0);
 
+    }
+
+    private void debugForceGameOver(long beginTime) {
+        if(System.currentTimeMillis()-beginTime > 15_000){
+            System.out.println("kill all");
+            this.board.getBalls().stream().forEach(elem->elem.kill());
+            gameInProgress = false;
+        }
     }
 
     private void log(String msg) {

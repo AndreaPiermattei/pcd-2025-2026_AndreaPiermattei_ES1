@@ -74,7 +74,7 @@ public class MainLoop extends Thread{
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         this.gameInProgress = true;
-        this.board.init("S");
+        this.board.init("L");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
     }
@@ -151,12 +151,12 @@ public class MainLoop extends Thread{
 
             this.board.updateEveryPlayerBall(elapsed);
 
-            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
+            //this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
+            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
 
-            this.scorePlayer = this.monitorBalls.calculateScores();
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
-                this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
+                this.scorePlayer = this.monitorBalls.calculateScores();
 
                 //System.out.println("not HOLD");
                 nFrames++;

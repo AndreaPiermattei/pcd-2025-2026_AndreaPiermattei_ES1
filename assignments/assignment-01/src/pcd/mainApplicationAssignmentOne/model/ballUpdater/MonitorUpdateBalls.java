@@ -2,13 +2,17 @@ package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
 public interface MonitorUpdateBalls {
 
-    public void updateBall(final int ballNumber);
-    public void updateTime(long dt);
-    public void timeToStop(int numberOfUpdater);
-    public void timeTiBegin(int numberOfUpdater);
-    public void createTurnsOfUpdaters(int numberOfUpdaters);
-    public void waitForUpdatePhase(int numberOfUpdater);
-    public void beginUpdatePhase();
-    public boolean isTimeToRender();
-    public int calculateScores();
+    void updateBall(final int ballNumber);
+    void updateTime(long dt);
+    void timeToStop(int numberOfUpdater);
+    void timeTiBegin(int numberOfUpdater);
+    void createTurnsOfUpdaters(int numberOfUpdaters);
+    void waitForUpdatePhase(int numberOfUpdater);
+    void beginUpdatePhase();
+    boolean isTimeToRender();
+    int calculateScores();
+    void checkCollisionWithHoles(int ballNumber);
+    boolean areAllBallsDead();
+    void resolveCollisionsBalls();
+    void updatePlayersBalls();
 }

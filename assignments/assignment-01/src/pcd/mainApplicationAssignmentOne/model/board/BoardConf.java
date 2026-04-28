@@ -10,6 +10,8 @@ public interface BoardConf {
 	Boundary getBoardBoundary();
 	
 	Ball getPlayerBall();
+
+	List<Ball> getPlayersBalls();
 	
 	List<Ball> getSmallBalls();
 

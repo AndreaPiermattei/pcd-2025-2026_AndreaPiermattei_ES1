@@ -43,10 +43,20 @@ public class LargeBoardConf implements BoardConf {
         var holes = new ArrayList<Hole>();
 		var py =  0.85;
     	for (int row = 0; row < 2; row++) {
-        	var px = -0.99 + row*2;
+        	var px = -0.88 + row*2;
         	var hole = new Hole(holeRadius, new P2d(px, py));
 			holes.add(hole);
     	}		
     	return holes;
+	}
+
+	@Override
+	public List<Ball> getPlayersBalls() {
+		var numberOfPlayers = 2;
+		List<Ball> players = new ArrayList<>();
+		for(int i = 0; i < numberOfPlayers; i++){
+			players.add(new Ball(new P2d(0.5*i, -0.75), 0.05, 1.5, new V2d(0,0), Optional.of(i+1)));
+		}
+		return players;
 	}
 }

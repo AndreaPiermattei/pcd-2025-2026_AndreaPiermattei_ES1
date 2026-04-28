@@ -2,7 +2,6 @@ package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CyclicBarrier;
 
 import pcd.mainApplicationAssignmentOne.model.Hole;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
@@ -14,6 +13,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     private int totalNumberOfUpdaters;
     private int numberOfUpdatersDone=0;
     private List<SimpleTurnImpl> statesOfUpdaters;
+    private volatile boolean gameInProgress = true;
 
     @Override
     public synchronized int calculateScores(){
@@ -46,14 +46,16 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     public void updateBall(final int ballNumber) {
         if(this.board.getBalls().get(ballNumber).isAlive()){
             this.board.getBalls().get(ballNumber).updateState(this.dt, board); 
-            for(int i = 0; i<this.board.getHoles().size();i++){
-                if(Hole.checkCollision(this.board.getBalls().get(ballNumber), this.board.getHoles().get(i))) {
-                    this.board.getBalls().get(ballNumber).kill();
-                }   
-            }
         }
-        
+    }
 
+    @Override
+    public void checkCollisionWithHoles(final int ballNumber) {
+        for(var hole : this.board.getHoles()){
+            if(Hole.checkCollision(this.board.getBalls().get(ballNumber), hole)) {
+                this.board.getBalls().get(ballNumber).kill();
+            }   
+        }
     }
 
     @Override
@@ -69,15 +71,15 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
     @Override
     public synchronized void waitForUpdatePhase(final int numberOfUpdater){
-        
         while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn()){
-            //System.out.println(numberOfUpdater+"wait");
             try {
+                
                 wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        
     }
 
     @Override
@@ -92,13 +94,28 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
 
     @Override
-    public void timeTiBegin(final int numberOfUpdater){
+    public synchronized void timeTiBegin(final int numberOfUpdater){
         this.statesOfUpdaters.get(numberOfUpdater).beginTurn();
     }
 
     @Override
     public synchronized boolean isTimeToRender(){
         return this.numberOfUpdatersDone == this.totalNumberOfUpdaters;
+    }
+
+    @Override
+    public synchronized boolean areAllBallsDead(){
+        return this.board.getBalls().stream().filter(elem->elem.isAlive()).toList().size() == 0;
+    }
+
+    @Override
+    public synchronized void resolveCollisionsBalls(){
+        this.board.updateStateCollisions();
+    }
+
+    @Override
+    public synchronized void updatePlayersBalls(){
+        this.board.updateEveryPlayerBall(dt);
     }
 
 }

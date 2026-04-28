@@ -6,10 +6,15 @@ import pcd.mainApplicationAssignmentOne.model.Hole;
 
 public class Board {
 
+
+    private static final int INDEX_HUMAN_BALL = 0;
+    private static final int INDEX_AI_BALL = 1;
+
     protected List<Ball> balls;    
     protected List<Hole> holes;    
+    private List<Ball> playersBalls;
 
-    protected Ball playerBall;
+    //protected Ball playerBall;
     protected Boundary bounds;
     
     public Board(){} 
@@ -24,7 +29,7 @@ public class Board {
             
             case "S":
                 System.out.println("MINIMAL CONFIGURATION SELECTED");
-                configurationOfBoard = new MinimalBoardConf();
+                configurationOfBoard = new SmallBoardConf();
                 break;
 
             case "M":
@@ -38,10 +43,11 @@ public class Board {
                 break;
         }
 
-    	balls = configurationOfBoard.getSmallBalls();    	
-    	playerBall = configurationOfBoard.getPlayerBall(); 
-    	bounds = configurationOfBoard.getBoardBoundary();
-        holes = configurationOfBoard.getHoles();
+        this.playersBalls = configurationOfBoard.getPlayersBalls();
+    	this.balls = configurationOfBoard.getSmallBalls();    	
+    	//this.playerBall = configurationOfBoard.getPlayerBall(); 
+    	this.bounds = configurationOfBoard.getBoardBoundary();
+        this.holes = configurationOfBoard.getHoles();
     }
     
     /*public void updateState(long dt) {
@@ -67,8 +73,12 @@ public class Board {
     	   	    	
     }*/
 
-    public void updatePlayerBall(final long dt){
-        playerBall.updateState(dt, this);
+    public void updateControlledPlayerBall(final long dt){
+        getHumanBall().updateState(dt, this);
+    }
+
+    public void updateEveryPlayerBall(final long dt){
+        this.playersBalls.forEach(player -> player.updateState(dt, this));
     }
 
     public void updateStateCollisions(){
@@ -86,17 +96,20 @@ public class Board {
             }
         }*/ //sostiyuito dal controllo fatto con i Updaters
     	for (var b: balls.stream().filter(ball -> ball.isAlive()).toList()) {
-    		Ball.resolveCollision(playerBall, b);
+            playersBalls.forEach(player -> Ball.resolveCollision(player, b));
+    		//Ball.resolveCollision(playerBall, b);
     	} 
+
+        Ball.resolveCollision(getHumanBall(), getAiBall());
     }
     
     public List<Ball> getBalls(){
     	return balls;
     }
     
-    public Ball getPlayerBall() {
+    /*public Ball getPlayerBall() {
     	return playerBall;
-    }
+    }*/
     
     public  Boundary getBounds(){
         return bounds;
@@ -104,6 +117,18 @@ public class Board {
 
     public List<Hole> getHoles() {
         return holes;
+    }
+
+    public List<Ball> getPlayersBalls(){
+        return this.playersBalls;
+    }
+
+    public Ball getHumanBall() {
+    	return this.playersBalls.get(INDEX_HUMAN_BALL);
+    }
+
+    public Ball getAiBall(){
+        return this.playersBalls.get(INDEX_AI_BALL);
     }
 
 }

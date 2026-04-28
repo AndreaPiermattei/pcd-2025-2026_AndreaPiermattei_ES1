@@ -44,4 +44,10 @@ public class MinimalBoardConf implements BoardConf {
     	}		
     	return holes;	}
 
+	@Override
+	public List<Ball> getPlayersBalls() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getPlayersBalls'");
+	}
+
 }

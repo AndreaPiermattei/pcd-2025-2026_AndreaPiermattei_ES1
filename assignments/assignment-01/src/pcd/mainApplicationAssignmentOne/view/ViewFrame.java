@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
@@ -25,12 +26,14 @@ public class ViewFrame extends JFrame implements KeyListener{
     private VisualiserPanel panel;
     private ViewModel model;
     private RenderSynch sync;
+	
 
 	//new code for input handling
 	private MainLoop activeController;
 	//end new code
 	
-    public ViewFrame(ViewModel model, int w, int h){ //da cancellare
+    public ViewFrame(ViewModel model, int w, int h){
+		
     	this.model = model;
 		this.activeController = null;
     	this.sync = new RenderSynch();
@@ -121,7 +124,7 @@ public class ViewFrame extends JFrame implements KeyListener{
 		return listBalls.size();
 	}
 
-	private int drawAliveBallsOfPlayerOne(Graphics2D g2,int ox,int oy,int delta){
+	private int drawAliveBallsOfPlayer(Graphics2D g2,int ox,int oy,int delta, int playerNumber){
 		
 		return drawFromListOfBalls(g2,
 			ox,
@@ -130,9 +133,9 @@ public class ViewFrame extends JFrame implements KeyListener{
 			model.getAliveBalls()
 				.stream()
 				.filter(elem->elem.ballCollideWith().isPresent())
-				.filter(elem->elem.ballCollideWith().get().intValue() == 1)
+				.filter(elem->elem.ballCollideWith().get().intValue() == playerNumber)
 				.toList(),
-			Color.GREEN);
+			(playerNumber==1) ? (Color.GREEN) : (Color.BLUE));
 	}
 
 	private int drawAliveBallsOfNoPlayer(Graphics2D g2,int ox,int oy,int delta){
@@ -148,7 +151,8 @@ public class ViewFrame extends JFrame implements KeyListener{
 	}
 	
 	private int drawAliveBalls(Graphics2D g2,int ox,int oy,int delta){
-		return (drawAliveBallsOfPlayerOne(g2,ox,oy,delta)
+		return (drawAliveBallsOfPlayer(g2,ox,oy,delta,1)
+				+drawAliveBallsOfPlayer(g2, ox, oy, delta, 2)
 				+drawAliveBallsOfNoPlayer(g2,ox,oy,delta));
 	}
 
@@ -161,7 +165,7 @@ public class ViewFrame extends JFrame implements KeyListener{
 					.toList();
 		
 		if(debug)
-			return drawFromListOfBalls(g2, ox, oy, delta,list, Color.RED);
+			return drawFromListOfBalls(g2, ox, oy, delta,list, (playerNumber==1) ? (Color.RED) : (Color.ORANGE));
 
 		return countButDoNotDrawBalls(list);
 	}
@@ -180,8 +184,10 @@ public class ViewFrame extends JFrame implements KeyListener{
         private int ox;
         private int oy;
         private int delta;
+		private ArrayList<HoleViewInfo> holes ;
         
         public VisualiserPanel(int w, int h){
+			this.holes = model.getHoles();
             setSize(w,h + 25);
             ox = w/2;
             oy = h/2;
@@ -206,23 +212,29 @@ public class ViewFrame extends JFrame implements KeyListener{
 			var countAliveBallsDrawn = drawAliveBalls(g2, ox, oy, delta);
 			
 			var countBallsKilledByPlayerDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 1,true);
-			
+			var countBallsKilledByAIDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 2,true);
 			var countBallsSelfKilledDrawn = drawKilledBallsByNoPlayer(g2, ox, oy, delta,false);
 
 			//fine disegno palline
 			g2.setColor(Color.BLACK);
 			g2.setStroke(new BasicStroke(3));
-			var pb = model.getPlayerBall();
+			var pb = model.getHumanBall();
 			if (pb != null) {
 				drawBall(g2, ox, oy, delta, pb);
 			}
 
+			var ai = model.getAiBall();
+			if (ai != null) {
+				drawBall(g2, ox, oy, delta, ai);
+			}
+
 			g2.setColor(Color.RED);
 			g2.setStroke(new BasicStroke(2));
-			for (var h: model.getHoles()) {
-				var p = h.pos();
-				int x0 = (int)(ox + p.x()*delta);
-				int y0 = (int)(oy - p.y()*delta);
+
+			for (int i=0; i<holes.size(); i++) { //strano warning su questo gruppo di linee linea: Exception in thread "AWT-EventQueue-0" java.util.ConcurrentModificationException
+				var h = holes.get(i);
+				int x0 = (int)(ox + h.pos().x()*delta);
+				int y0 = (int)(oy - h.pos().y()*delta);
 				int radiusX = (int)(h.radius()*delta);
 				int radiusY = (int)(h.radius()*delta);
 				g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
@@ -239,6 +251,8 @@ public class ViewFrame extends JFrame implements KeyListener{
 			g2.drawString("#---Num. killed by no player: " + countBallsSelfKilledDrawn, 20, 140);
 			sync.notifyFrameRendered();
 			g2.drawString("#---Num. killed by player1: " + countBallsKilledByPlayerDrawn, 20, 160);
+			sync.notifyFrameRendered();
+			g2.drawString("#---Num. killed by player1: " + countBallsKilledByAIDrawn, 20, 180);
 			sync.notifyFrameRendered();
     		
         }

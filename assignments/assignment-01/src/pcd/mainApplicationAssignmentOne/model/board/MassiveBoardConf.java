@@ -23,7 +23,7 @@ public class MassiveBoardConf implements BoardConf {
         var balls = new ArrayList<Ball>();
 
     	for (int row = 0; row < 30; row++) {
-    		for (int col = 0; col < 155; col++) {
+    		for (int col = 0; col < 100; col++) {
         		var px = -1.0 + col*0.0155;
         		var py =  row*0.0155;
         		var b = new Ball(new P2d(px, py), ballRadius, 0.25, new V2d(0,0),Optional.empty());
@@ -48,5 +48,15 @@ public class MassiveBoardConf implements BoardConf {
 			holes.add(hole);
     	}		
     	return holes;
+	}
+
+	@Override
+	public List<Ball> getPlayersBalls() {
+		var numberOfPlayers = 2;
+		List<Ball> players = new ArrayList<>();
+		for(int i = 0; i < numberOfPlayers; i++){
+			players.add(new Ball(new P2d(0.5*i, -0.75), 0.05, 1.5, new V2d(0,0), Optional.of(i+1)));
+		}
+		return players;
 	}
 }

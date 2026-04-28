@@ -34,12 +34,15 @@ public class BallUpdater extends Thread{
         while(monitorGame.isGameInProgress()){
             //System.out.println(this.thradNumber+" begin update");
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
+                
                 this.monitorParallelUpdateBall.updateBall(this.currentBallIndex);
+                this.monitorParallelUpdateBall.checkCollisionWithHoles(this.currentBallIndex);
                 
             }
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }
+        System.out.println(this.getName()+" shutting down");
     }
     
     public void run() {

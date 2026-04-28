@@ -10,6 +10,7 @@ import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
+import pcd.mainApplicationAssignmentOne.util.V2d;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBufferPollImpl;
 import pcd.mainApplicationAssignmentOne.view.View;
@@ -19,6 +20,7 @@ public class MainLoop extends Thread{
 
     private BoundedBuffer<Cmd> bufferInputCommands;
 
+    Random rand = new Random(6969420);
     private int scorePlayer = 0;
     private boolean gameInProgress = false;
     private final Board board = new Board();
@@ -35,14 +37,14 @@ public class MainLoop extends Thread{
         System.out.println("CREATING BALL UPDATERS...\n\n    -N. processors available: "+numberOfProcessors
                             +"\n    -N. balls on the board: "+numberOfBallsOnBoard);
 
-        final var lessBallsThanProcessors = numberOfBallsOnBoard < numberOfProcessors;
+        final var lessBallsThanProcessors = numberOfBallsOnBoard <= numberOfProcessors;
 
         final var numberOfBallUpdaters = (lessBallsThanProcessors ?
                                             numberOfBallsOnBoard : 
                                             numberOfProcessors);
         final var sizeBallListForThread = (lessBallsThanProcessors ?
                                             1 : 
-                                            (numberOfBallsOnBoard/(numberOfBallUpdaters)));
+                                            (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
         System.out.println("    -N. of updaters to create: " + numberOfBallUpdaters+
         "\n    -N. of balls for each thread: " + sizeBallListForThread+"\n");
 
@@ -69,11 +71,10 @@ public class MainLoop extends Thread{
 
     public void initializeGame(){
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
-
+        this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         this.gameInProgress = true;
-        this.setName("MAIN THREAD OF GAME");
-        this.board.init("L");
+        this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
     }
@@ -83,7 +84,6 @@ public class MainLoop extends Thread{
 			Thread.sleep(3000);
 		} catch (Exception ex) {}
 	}
-
 
     public void notifyNewCmd(Cmd cmd) {
 		try {
@@ -95,13 +95,22 @@ public class MainLoop extends Thread{
 	}
 
 
+    private double chooseRandomAngle(){
+       return rand.nextDouble()*Math.PI*0.25; 
+    }
+
+    private V2d calculateVelocityVector(final double angle){
+        return new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
+    }
+
     public void run(){
-        
-        waitAbit();
-        long startForcedGameOver = System.currentTimeMillis();
+        var ai = this.board.getAiBall();
+        //waitAbit();
+        var startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
-		long t0 = System.currentTimeMillis();
-		long lastUpdateTime = System.currentTimeMillis();
+		var t0 = System.currentTimeMillis();
+		var lastUpdateTime = System.currentTimeMillis();
+        var lastKickTime = t0;
         try{
             final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
@@ -117,15 +126,13 @@ public class MainLoop extends Thread{
 		this.view.render();
 		
         System.out.println("BEGIN GAME");
-        while(gameInProgress){
-
+        while(monitorGame.isGameInProgress()){
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
                     //log("new cmd fetched:");
                     cmd.get().execute(board);
                 }
-				
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -136,30 +143,39 @@ public class MainLoop extends Thread{
 			lastUpdateTime = System.currentTimeMillis();	
             this.monitorBalls.updateTime(elapsed);
 
-            this.board.updatePlayerBall(elapsed);	
+            if (ai.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 1000) {
+				ai.kick(calculateVelocityVector(chooseRandomAngle()));
+				lastKickTime = System.currentTimeMillis();
+			}
+            //this.board.updatePlayerBall(elapsed);	
+
+            this.board.updateEveryPlayerBall(elapsed);
+
             this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
 
             this.scorePlayer = this.monitorBalls.calculateScores();
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
+                this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
+
                 //System.out.println("not HOLD");
-                
                 nFrames++;
                 int framePerSec = 0;
                 long dt = (System.currentTimeMillis() - t0);
                 if (dt > 0) {
                     framePerSec = (int)(nFrames*1000/dt);
                 }
-
                 viewModel.update(board, framePerSec);			
                 view.render();
-
                 this.monitorBalls.beginUpdatePhase();
-            }else{
-                //System.out.println("HOLD");
+                
+                if(this.monitorBalls.areAllBallsDead() || 
+                    !this.board.getAiBall().isAlive() || 
+                    !this.board.getHumanBall().isAlive()){
+                        this.monitorGame.stopGame();
+                }
             }
-
-            debugForceGameOver(startForcedGameOver);
+            //debugForceGameOver(startForcedGameOver);
 
         }
         
@@ -168,11 +184,11 @@ public class MainLoop extends Thread{
 
     }
 
-    private void debugForceGameOver(long beginTime) {
+    private synchronized void debugForceGameOver(long beginTime) {
         if(System.currentTimeMillis()-beginTime > 15_000){
             System.out.println("kill all");
             this.board.getBalls().stream().forEach(elem->elem.kill());
-            gameInProgress = false;
+            this.monitorGame.stopGame();
         }
     }
 

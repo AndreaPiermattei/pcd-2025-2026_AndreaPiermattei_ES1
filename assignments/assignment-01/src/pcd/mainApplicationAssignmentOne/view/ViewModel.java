@@ -7,21 +7,24 @@ import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 
 record BallViewInfo(P2d pos, double radius, Optional<Integer> player, Optional<Integer> ballCollideWith) {}
-
 record HoleViewInfo(P2d pos, double radius) {}
 
 public class ViewModel {
 
+	private static final int INDEX_AI_BALL = 1;
+	private static final int INDEX_HUMAN_BALL = 0;
+
 	private ArrayList<BallViewInfo> aliveBalls;
 	private ArrayList<HoleViewInfo> holes;
 	private ArrayList<BallViewInfo> deadBallsForDebug;
-	private BallViewInfo player;
+	private ArrayList<BallViewInfo> playersBalls;
 	private int framePerSec;
 	
 	public ViewModel() {
-		aliveBalls = new ArrayList<BallViewInfo>();
-		deadBallsForDebug = new ArrayList<BallViewInfo>();
-		holes = new ArrayList<HoleViewInfo>();
+		aliveBalls = new ArrayList<>();
+		deadBallsForDebug = new ArrayList<>();
+		holes = new ArrayList<>();
+		playersBalls = new ArrayList<>();
 		framePerSec = 0;
 	}
 	
@@ -29,6 +32,7 @@ public class ViewModel {
 		aliveBalls.clear();
 		holes.clear();
 		deadBallsForDebug.clear();
+		playersBalls.clear();
 		//board.getBalls().stream().filter(ball ->  ball.isAlive()).toList();
 
 		//for (var b: board.getBalls()) {
@@ -43,10 +47,16 @@ public class ViewModel {
 		for (var h: board.getHoles()){
 			holes.add(new HoleViewInfo(h.getPos(), h.getRadius()));
 		}
+		for (var p: board.getPlayersBalls()){
+			playersBalls.add(new BallViewInfo(p.getPos(), p.getRadius(),p.getPlayer(),p.getBallCollidedWith()));
+		}
 
 		this.framePerSec = framePerSec;
-		var p = board.getPlayerBall();
-		player = new BallViewInfo(p.getPos(), p.getRadius(),p.getPlayer(),p.getBallCollidedWith());
+		//var p = board.getPlayerBall();
+		//player = new BallViewInfo(p.getPos(), p.getRadius(),p.getPlayer(),p.getBallCollidedWith());
+
+
+
 	}
 	
 
@@ -73,8 +83,16 @@ public class ViewModel {
 		return framePerSec;
 	}
 
-	public synchronized BallViewInfo getPlayerBall() {
+	/*public synchronized BallViewInfo getPlayerBall() {
 		return player;
+	}*/
+
+	public synchronized BallViewInfo getHumanBall(){
+		return playersBalls.get(INDEX_HUMAN_BALL);
+	}
+
+	public synchronized BallViewInfo getAiBall(){
+		return playersBalls.get(INDEX_AI_BALL);
 	}
 	
 }

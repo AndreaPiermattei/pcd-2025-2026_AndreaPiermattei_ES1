@@ -10,6 +10,7 @@ public class BallUpdater extends Thread{
     private final int indexLastBall;
     private int currentBallIndex;
     private final int thradNumber;
+    private final boolean permanentStop = false;
 
     public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final  MonitorGameStateImpl monitorGame, final int indexFirstBall, final int indexLastBall) {
         this.setName("Updater_N."+numberThread);
@@ -31,7 +32,7 @@ public class BallUpdater extends Thread{
     }
 
     private void logicVersionWithFor(){
-        while(monitorGame.isGameInProgress()){
+        while(monitorParallelUpdateBall.isGameInProgress()){
             //System.out.println(this.thradNumber+" begin update");
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
                 
@@ -42,7 +43,7 @@ public class BallUpdater extends Thread{
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }
-        System.out.println(this.getName()+" shutting down");
+        //System.out.println(this.getName()+" shutting down");
     }
     
     public void run() {

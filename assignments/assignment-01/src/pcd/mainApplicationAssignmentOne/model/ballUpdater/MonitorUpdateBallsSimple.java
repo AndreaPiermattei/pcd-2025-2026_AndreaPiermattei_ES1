@@ -8,6 +8,9 @@ import pcd.mainApplicationAssignmentOne.model.board.Board;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
+    private static final int INDEX_HUMAN_BALL = 0;
+    private static final int INDEX_AI_BALL = 1;
+
     private final Board board;
     private long dt = 0;
     private int totalNumberOfUpdaters;
@@ -16,14 +19,34 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     private volatile boolean gameInProgress = true;
 
     @Override
-    public synchronized int calculateScores(){
+    public synchronized boolean isGameInProgress() {
+        return gameInProgress;
+    }
+
+    @Override
+    public synchronized void stopGame() {
+        this.gameInProgress = false;
+        notifyAll();
+    }
+
+    private int calculateScorePlayer(int player){
         return this.board.getBalls()
         .stream()
         .filter(elem->!elem.isAlive())
         .filter(elem->elem.getBallCollidedWith().isPresent())
-        .filter(elem->elem.getBallCollidedWith().get() == 1)
+        .filter(elem->elem.getBallCollidedWith().get() == player)
         .toList()
         .size();
+    }
+
+    @Override
+    public int calculateAIScore() {
+        return calculateScorePlayer(INDEX_AI_BALL);
+    }
+
+    @Override
+    public synchronized int calculateHumanScore(){
+        return calculateScorePlayer(INDEX_HUMAN_BALL);
     }
 
     public MonitorUpdateBallsSimple(final Board board2) {
@@ -71,7 +94,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
     @Override
     public synchronized void waitForUpdatePhase(final int numberOfUpdater){
-        while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn()){
+        while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn() && isGameInProgress()){
             try {
                 
                 wait();
@@ -117,5 +140,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     public synchronized void updatePlayersBalls(){
         this.board.updateEveryPlayerBall(dt);
     }
+
+   
 
 }

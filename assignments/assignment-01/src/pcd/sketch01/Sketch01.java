@@ -13,7 +13,7 @@ public class Sketch01 {
 	public static void main(String[] argv) {
 
 		
-		Board board = new Board();
+		/*Board board = new Board();
 		board.init("L");
 		
 		ViewModel viewModel = new ViewModel();
@@ -31,11 +31,11 @@ public class Sketch01 {
 		var rand = new Random(2);
 		var lastKickTime = t0;
 				
-		/* main simulation loop */
+		
 		
 		while (true){			
 		
-			/* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
+			
 
 			if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 2000) {
 				var angle = rand.nextDouble() * Math.PI * 0.25;
@@ -44,14 +44,14 @@ public class Sketch01 {
 				lastKickTime = System.currentTimeMillis();
 			}
 			
-			/* update board state */
+			
 			
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();			
 			board.updatePlayerBall(elapsed);
 			board.updateStateCollisions();
 			
-			/* render */
+			
 			
 			nFrames++;
 			int framePerSec = 0;
@@ -63,7 +63,7 @@ public class Sketch01 {
 			viewModel.update(board, framePerSec);			
 			view.render();
 			
-		}
+		}*/
 	}
 	
 	private static void waitAbit() {

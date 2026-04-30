@@ -79,6 +79,15 @@ public class Board {
 
     public void updateEveryPlayerBall(final long dt){
         this.playersBalls.forEach(player -> player.updateState(dt, this));
+        for(var p: this.playersBalls){
+            //p.updateState(dt, this);
+            for(var h: this.holes){
+                if(Hole.checkCollision(p, h)){
+                    p.kill();
+                }
+            }
+        }
+
     }
 
     public void updateStateCollisions(){

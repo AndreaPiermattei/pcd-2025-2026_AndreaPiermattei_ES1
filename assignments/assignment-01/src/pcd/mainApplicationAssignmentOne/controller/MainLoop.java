@@ -22,6 +22,7 @@ public class MainLoop extends Thread{
 
     Random rand = new Random(6969420);
     private int scorePlayer = 0;
+    private int scoreAI = 0;
     private boolean gameInProgress = false;
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
@@ -126,7 +127,7 @@ public class MainLoop extends Thread{
 		this.view.render();
 		
         System.out.println("BEGIN GAME");
-        while(monitorGame.isGameInProgress()){
+        while(monitorBalls.isGameInProgress()){
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
@@ -148,15 +149,16 @@ public class MainLoop extends Thread{
 				lastKickTime = System.currentTimeMillis();
 			}
             //this.board.updatePlayerBall(elapsed);	
-
+            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
             this.board.updateEveryPlayerBall(elapsed);
 
             //this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
-            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
+            
 
 			/* render */
 			if(this.monitorBalls.isTimeToRender()){
-                this.scorePlayer = this.monitorBalls.calculateScores();
+                this.scorePlayer = this.monitorBalls.calculateHumanScore();
+                this.scoreAI = this.monitorBalls.calculateAIScore();
 
                 //System.out.println("not HOLD");
                 nFrames++;
@@ -172,23 +174,42 @@ public class MainLoop extends Thread{
                 if(this.monitorBalls.areAllBallsDead() || 
                     !this.board.getAiBall().isAlive() || 
                     !this.board.getHumanBall().isAlive()){
-                        this.monitorGame.stopGame();
+                        this.monitorBalls.stopGame();
                 }
             }
-            //debugForceGameOver(startForcedGameOver);
+            debugForceGameOver(startForcedGameOver);
 
         }
         
-        System.out.println("ALL done "+this.scorePlayer);
+        checkWhoWins();
         //System.exit(0);
+
+    }
+
+    private void checkWhoWins(){
+
+        if(!this.board.getAiBall().isAlive()){
+            System.out.println("ai dead - human wins");
+        
+        }else if(!this.board.getHumanBall().isAlive()){
+            System.out.println("human dead - ai wins");
+        }else if(this.scoreAI > this.scorePlayer){
+           System.out.println("ai wins");
+           System.out.println(this.scoreAI);
+        }else if(this.scoreAI < this.scorePlayer){
+            System.out.println("human wins");
+            System.out.println(this.scorePlayer);
+        }else{
+            System.out.println("TIE");
+        }
 
     }
 
     private synchronized void debugForceGameOver(long beginTime) {
         if(System.currentTimeMillis()-beginTime > 15_000){
             System.out.println("kill all");
-            this.board.getBalls().stream().forEach(elem->elem.kill());
-            this.monitorGame.stopGame();
+            //this.board.getBalls().stream().forEach(elem->elem.kill());
+            this.monitorBalls.stopGame();
         }
     }
 

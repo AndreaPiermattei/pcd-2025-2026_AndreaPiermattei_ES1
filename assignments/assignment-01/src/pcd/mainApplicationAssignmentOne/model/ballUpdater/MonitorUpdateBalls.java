@@ -10,9 +10,12 @@ public interface MonitorUpdateBalls {
     void waitForUpdatePhase(int numberOfUpdater);
     void beginUpdatePhase();
     boolean isTimeToRender();
-    int calculateScores();
+    int calculateHumanScore();
+    int calculateAIScore();
     void checkCollisionWithHoles(int ballNumber);
     boolean areAllBallsDead();
     void resolveCollisionsBalls();
     void updatePlayersBalls();
+    boolean isGameInProgress();
+    void stopGame();
 }

@@ -23,18 +23,10 @@ public class BallUpdater extends Thread{
         System.out.println(this.getName()+" created with range: "+this.indexFirstBall+" - "+this.indexLastBall);
     }
 
-    private void sleepFor(long millis){
-        try {
-            Thread.sleep(millis);
-        } catch (Exception ex) {
-            System.err.println(ex);
-        }
-    }
-
     private void logicVersionWithFor(){
         var lastUpdateTime = System.currentTimeMillis();
 
-        while(this.monitorParallelUpdateBall.isGameInProgress()){
+        while(this.monitorGame.isGameInProgress()){
             //System.out.println(this.thradNumber+" begin update");
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
@@ -47,7 +39,7 @@ public class BallUpdater extends Thread{
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }
-        //System.out.println(this.getName()+" shutting down");
+        System.out.println(this.getName()+" shutting down");
     }
     
     public void run() {

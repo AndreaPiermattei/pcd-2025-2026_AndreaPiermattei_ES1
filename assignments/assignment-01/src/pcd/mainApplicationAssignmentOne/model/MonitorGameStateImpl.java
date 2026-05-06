@@ -7,11 +7,7 @@ public class MonitorGameStateImpl {
     public synchronized boolean isGameInProgress() { 
         return gameInProgress;
     }
-
     public synchronized void stopGame() {
         gameInProgress = false;
     }
-
-    
-    
 }

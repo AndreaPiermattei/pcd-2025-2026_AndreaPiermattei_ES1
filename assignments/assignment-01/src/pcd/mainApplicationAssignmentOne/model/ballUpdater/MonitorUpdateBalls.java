@@ -14,9 +14,9 @@ public interface MonitorUpdateBalls {
     boolean areAllBallsDead();
     void resolveCollisionsBalls();
     void updatePlayersBalls();
-    boolean isGameInProgress();
-    void stopGame();
     boolean isParallelUpdatePhase();
     void stopParallelUpdsatePhase();
     void updateBallWithDt(long dtime, int ballNumber);
+    void informGameOver();
+    boolean isGameInProgress();
 }

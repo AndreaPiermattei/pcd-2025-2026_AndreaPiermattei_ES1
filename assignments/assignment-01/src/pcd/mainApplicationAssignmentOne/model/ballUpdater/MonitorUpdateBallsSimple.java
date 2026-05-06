@@ -8,9 +8,6 @@ import pcd.mainApplicationAssignmentOne.model.board.Board;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
-    private static final int INDEX_HUMAN_BALL = 0;
-    private static final int INDEX_AI_BALL = 1;
-
     private final Board board;
     private long dt = 0;
     private int totalNumberOfUpdaters;
@@ -104,14 +101,13 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     public synchronized void updateTime(final long dt){
         this.dt = dt;
     }
-
+    
     @Override
     public synchronized boolean isGameInProgress() {
         return gameInProgress;
     }
-
     @Override
-    public synchronized void stopGame() {
+    public synchronized void informGameOver() {
         this.gameInProgress = false;
         notifyAll();
     }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.model.DumbEnemyAI;
+import pcd.mainApplicationAssignmentOne.model.MonitorBallOfAI;
 import pcd.mainApplicationAssignmentOne.model.MonitorGameStateImpl;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
@@ -19,14 +21,11 @@ import pcd.mainApplicationAssignmentOne.view.ViewModel;
 public class MainLoop extends Thread{
 
     private BoundedBuffer<Cmd> bufferInputCommands;
-
     Random rand = new Random(6969420);
-    //private int scorePlayer = 0;
-    //private int scoreAI = 0;
-    private boolean gameInProgress = false;
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
     private MonitorGameStateImpl monitorGame;
+    private MonitorBallOfAI monitorBallAI;
     private final ViewModel viewModel = new ViewModel();
 	private final View view = new View(viewModel, 1200, 800, this);
 
@@ -74,15 +73,16 @@ public class MainLoop extends Thread{
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
-        this.gameInProgress = true;
+        
         this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
+        this.monitorBallAI = new MonitorBallOfAI(board);
     }
 
     public void notifyNewCmd(Cmd cmd) {
 		try {
-            if(monitorBalls.isGameInProgress()){
+            if(monitorGame.isGameInProgress()){
                 bufferInputCommands.put(cmd);
             }
 		} catch (Exception ex) {
@@ -99,7 +99,7 @@ public class MainLoop extends Thread{
     }
 
     public void run(){
-        var ai = this.board.getAiBall();
+        var aiBall = this.board.getAiBall();
         //waitAbit();
         var startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
@@ -110,10 +110,14 @@ public class MainLoop extends Thread{
             final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
             launchUpdaters(threadsCreated);
+
+            final DumbEnemyAI ai = new DumbEnemyAI("stupidAI-th", true, monitorBallAI);
+            ai.start();
         }catch(Exception e){
             e.printStackTrace();
-            this.gameInProgress = false;
+            
             this.monitorGame.stopGame();
+            this.monitorBalls.informGameOver();
             System.exit(1);
         }
 
@@ -121,13 +125,13 @@ public class MainLoop extends Thread{
 		this.view.render();
 		
         System.out.println("BEGIN GAME");
-        while(monitorBalls.isGameInProgress()){
+        while(monitorGame.isGameInProgress()){
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();		
-            if (ai.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 700) {
-				ai.kick(calculateVelocityVector(chooseRandomAngle()));
+            /*if (aiBall.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 700) {
+				aiBall.kick(calculateVelocityVector(chooseRandomAngle()));
 				lastKickTime = System.currentTimeMillis();
-			}
+			}*/
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
@@ -141,7 +145,8 @@ public class MainLoop extends Thread{
 
             this.board.updateEveryPlayerBall(elapsed);
             
-           
+            /*the passive balls on board have been updated, thus we need
+            to check the collisions sequentially */
             if(this.monitorBalls.areAllUpdatersDone()){
                 this.monitorBalls.stopParallelUpdsatePhase();
                 this.board.updateStateCollisions(); 
@@ -150,9 +155,6 @@ public class MainLoop extends Thread{
             
             /*render */
 			if(this.monitorBalls.areAllUpdatersDone()){
-                
-                
-                //System.out.println("not HOLD");
                 nFrames++;
                 int framePerSec = 0;
                 long dt = (System.currentTimeMillis() - t0);
@@ -162,14 +164,15 @@ public class MainLoop extends Thread{
                 viewModel.update(board, framePerSec);			
                 view.render();
                 
-                
                 if(this.monitorBalls.areAllBallsDead() || 
                     !this.board.getAiBall().isAlive() || 
                     !this.board.getHumanBall().isAlive()){
-                        this.monitorBalls.stopGame();
+                        this.monitorBalls.informGameOver();
+                        this.monitorGame.stopGame();
+                }else{
+                    this.monitorBalls.beginUpdatePhase();
                 }
-                
-                this.monitorBalls.beginUpdatePhase();
+               
             }
             //debugForceGameOver(startForcedGameOver);
 
@@ -177,7 +180,7 @@ public class MainLoop extends Thread{
         
         this.board.checkWhoWins();
         try {
-            sleep(500);
+            sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -189,7 +192,7 @@ public class MainLoop extends Thread{
         if(System.currentTimeMillis()-beginTime > 15_000){
             System.out.println("kill all");
             //this.board.getBalls().stream().forEach(elem->elem.kill());
-            this.monitorBalls.stopGame();
+            this.monitorGame.stopGame();
         }
     }
 

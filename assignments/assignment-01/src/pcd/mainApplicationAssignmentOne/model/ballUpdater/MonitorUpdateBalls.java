@@ -9,13 +9,14 @@ public interface MonitorUpdateBalls {
     void createTurnsOfUpdaters(int numberOfUpdaters);
     void waitForUpdatePhase(int numberOfUpdater);
     void beginUpdatePhase();
-    boolean isTimeToRender();
-    int calculateHumanScore();
-    int calculateAIScore();
+    boolean areAllUpdatersDone();
     void checkCollisionWithHoles(int ballNumber);
     boolean areAllBallsDead();
     void resolveCollisionsBalls();
     void updatePlayersBalls();
     boolean isGameInProgress();
     void stopGame();
+    boolean isParallelUpdatePhase();
+    void stopParallelUpdsatePhase();
+    void updateBallWithDt(long dtime, int ballNumber);
 }

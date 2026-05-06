@@ -21,8 +21,8 @@ public class MainLoop extends Thread{
     private BoundedBuffer<Cmd> bufferInputCommands;
 
     Random rand = new Random(6969420);
-    private int scorePlayer = 0;
-    private int scoreAI = 0;
+    //private int scorePlayer = 0;
+    //private int scoreAI = 0;
     private boolean gameInProgress = false;
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
@@ -75,26 +75,20 @@ public class MainLoop extends Thread{
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         this.gameInProgress = true;
-        this.board.init("L");
+        this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
     }
 
-    private void waitAbit() {
-		try {
-			Thread.sleep(3000);
-		} catch (Exception ex) {}
-	}
-
     public void notifyNewCmd(Cmd cmd) {
 		try {
-			bufferInputCommands.put(cmd);
-            //System.out.println("comd found - put in buffer");
+            if(monitorBalls.isGameInProgress()){
+                bufferInputCommands.put(cmd);
+            }
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-
 
     private double chooseRandomAngle(){
        return rand.nextDouble()*Math.PI*0.25; 
@@ -128,6 +122,12 @@ public class MainLoop extends Thread{
 		
         System.out.println("BEGIN GAME");
         while(monitorBalls.isGameInProgress()){
+            long elapsed = System.currentTimeMillis() - lastUpdateTime;
+			lastUpdateTime = System.currentTimeMillis();		
+            if (ai.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 700) {
+				ai.kick(calculateVelocityVector(chooseRandomAngle()));
+				lastKickTime = System.currentTimeMillis();
+			}
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
@@ -136,30 +136,22 @@ public class MainLoop extends Thread{
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-			
+			}	
 			/* update board state */
-			
-			long elapsed = System.currentTimeMillis() - lastUpdateTime;
-			lastUpdateTime = System.currentTimeMillis();	
-            this.monitorBalls.updateTime(elapsed);
 
-            if (ai.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 1000) {
-				ai.kick(calculateVelocityVector(chooseRandomAngle()));
-				lastKickTime = System.currentTimeMillis();
-			}
-            //this.board.updatePlayerBall(elapsed);	
-            this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ??? adesso funziona ma è molto meno veloce (fps)
             this.board.updateEveryPlayerBall(elapsed);
-
-            //this.board.updateStateCollisions(); //??? perchè non funziona se lo metto nell' if ???
             
-
-			/* render */
-			if(this.monitorBalls.isTimeToRender()){
-                this.scorePlayer = this.monitorBalls.calculateHumanScore();
-                this.scoreAI = this.monitorBalls.calculateAIScore();
-
+           
+            if(this.monitorBalls.areAllUpdatersDone()){
+                this.monitorBalls.stopParallelUpdsatePhase();
+                this.board.updateStateCollisions(); 
+                this.board.updateScores();
+            }
+            
+            /*render */
+			if(this.monitorBalls.areAllUpdatersDone()){
+                
+                
                 //System.out.println("not HOLD");
                 nFrames++;
                 int framePerSec = 0;
@@ -169,39 +161,27 @@ public class MainLoop extends Thread{
                 }
                 viewModel.update(board, framePerSec);			
                 view.render();
-                this.monitorBalls.beginUpdatePhase();
+                
                 
                 if(this.monitorBalls.areAllBallsDead() || 
                     !this.board.getAiBall().isAlive() || 
                     !this.board.getHumanBall().isAlive()){
                         this.monitorBalls.stopGame();
                 }
+                
+                this.monitorBalls.beginUpdatePhase();
             }
-            debugForceGameOver(startForcedGameOver);
+            //debugForceGameOver(startForcedGameOver);
 
         }
         
-        checkWhoWins();
-        //System.exit(0);
-
-    }
-
-    private void checkWhoWins(){
-
-        if(!this.board.getAiBall().isAlive()){
-            System.out.println("ai dead - human wins");
-        
-        }else if(!this.board.getHumanBall().isAlive()){
-            System.out.println("human dead - ai wins");
-        }else if(this.scoreAI > this.scorePlayer){
-           System.out.println("ai wins");
-           System.out.println(this.scoreAI);
-        }else if(this.scoreAI < this.scorePlayer){
-            System.out.println("human wins");
-            System.out.println(this.scorePlayer);
-        }else{
-            System.out.println("TIE");
+        this.board.checkWhoWins();
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        System.exit(0);
 
     }
 

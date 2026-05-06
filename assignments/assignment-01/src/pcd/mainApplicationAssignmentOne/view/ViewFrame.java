@@ -87,7 +87,6 @@ public class ViewFrame extends JFrame implements KeyListener{
 		});
     }
 
-     
     public void render(){
 		long nf = sync.nextFrameToRender();
         panel.repaint();
@@ -211,18 +210,18 @@ public class ViewFrame extends JFrame implements KeyListener{
 			
 			var countAliveBallsDrawn = drawAliveBalls(g2, ox, oy, delta);
 			
-			var countBallsKilledByPlayerDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 1,true);
-			var countBallsKilledByAIDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 2,true);
+			var countBallsKilledByPlayerDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 1,false);
+			var countBallsKilledByAIDrawn = drawKilledBallsByPlayer(g2, ox, oy, delta, 2,false);
 			var countBallsSelfKilledDrawn = drawKilledBallsByNoPlayer(g2, ox, oy, delta,false);
 
 			//fine disegno palline
-			g2.setColor(Color.BLACK);
+			g2.setColor(Color.green);
 			g2.setStroke(new BasicStroke(3));
 			var pb = model.getHumanBall();
 			if (pb != null) {
 				drawBall(g2, ox, oy, delta, pb);
 			}
-
+			g2.setColor(Color.blue);
 			var ai = model.getAiBall();
 			if (ai != null) {
 				drawBall(g2, ox, oy, delta, ai);
@@ -244,16 +243,17 @@ public class ViewFrame extends JFrame implements KeyListener{
 			g2.setStroke(new BasicStroke(1));
 			g2.drawString("Num small balls: " + model.getAliveBalls().size(), 20, 40);
 			g2.drawString("Frame per sec: " + model.getFramePerSec(), 20, 60);
-
 			g2.drawString("# Num. Alive Balls drawn: " + countAliveBallsDrawn, 20, 80);
-			g2.drawString("# Num dead balls: " + model.getDeadBallsForDebug().size(), 20, 120);
-			
+			g2.drawString("# Num Dead Balls drawn: " + model.getDeadBallsForDebug().size(), 20, 120);
 			g2.drawString("#---Num. killed by no player: " + countBallsSelfKilledDrawn, 20, 140);
+			g2.drawString("#---Num. killed by playerH: " + countBallsKilledByPlayerDrawn, 20, 160);
+			g2.drawString("#---Num. killed by playerAI: " + countBallsKilledByAIDrawn, 20, 180);
+			g2.setColor(Color.BLUE);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawString("SCORE AI: " + model.getScoreAI(), 20, 700);
+			g2.drawString("SCORE Human: " + model.getScoreHuman(), 1000, 700);
 			sync.notifyFrameRendered();
-			g2.drawString("#---Num. killed by player1: " + countBallsKilledByPlayerDrawn, 20, 160);
-			sync.notifyFrameRendered();
-			g2.drawString("#---Num. killed by player1: " + countBallsKilledByAIDrawn, 20, 180);
-			sync.notifyFrameRendered();
+
     		
         }
         

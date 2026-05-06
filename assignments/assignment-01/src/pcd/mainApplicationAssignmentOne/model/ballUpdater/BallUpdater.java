@@ -32,14 +32,18 @@ public class BallUpdater extends Thread{
     }
 
     private void logicVersionWithFor(){
-        while(monitorParallelUpdateBall.isGameInProgress()){
+        var lastUpdateTime = System.currentTimeMillis();
+
+        while(this.monitorParallelUpdateBall.isGameInProgress()){
             //System.out.println(this.thradNumber+" begin update");
+            long elapsed = System.currentTimeMillis() - lastUpdateTime;
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
                 
-                this.monitorParallelUpdateBall.updateBall(this.currentBallIndex);
+                this.monitorParallelUpdateBall.updateBallWithDt(elapsed,this.currentBallIndex);
                 this.monitorParallelUpdateBall.checkCollisionWithHoles(this.currentBallIndex);
                 
             }
+            lastUpdateTime = System.currentTimeMillis() ;
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }

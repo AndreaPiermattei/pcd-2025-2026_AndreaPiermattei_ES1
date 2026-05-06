@@ -18,14 +18,17 @@ public class ViewModel {
 	private ArrayList<HoleViewInfo> holes;
 	private ArrayList<BallViewInfo> deadBallsForDebug;
 	private ArrayList<BallViewInfo> playersBalls;
-	private int framePerSec;
+	private int scoreHuman=0;
+	private int scoreAI=0;
+
+	private int framePerSec=0;
 	
 	public ViewModel() {
 		aliveBalls = new ArrayList<>();
 		deadBallsForDebug = new ArrayList<>();
 		holes = new ArrayList<>();
 		playersBalls = new ArrayList<>();
-		framePerSec = 0;
+		//framePerSec = 0;
 	}
 	
 	public synchronized void update(Board board, int framePerSec) {
@@ -33,11 +36,8 @@ public class ViewModel {
 		holes.clear();
 		deadBallsForDebug.clear();
 		playersBalls.clear();
-		//board.getBalls().stream().filter(ball ->  ball.isAlive()).toList();
-
-		//for (var b: board.getBalls()) {
-		//	balls.add(new BallViewInfo(b.getPos(), b.getRadius()));
-		//}
+		scoreAI = board.getScoreAI();
+		scoreHuman=board.getScorePlayer();
 		for (var b: board.getBalls().stream().filter(ball ->  ball.isAlive()).toList()){
 			aliveBalls.add(new BallViewInfo(b.getPos(), b.getRadius(),b.getPlayer(),b.getBallCollidedWith()));
 		}
@@ -52,11 +52,7 @@ public class ViewModel {
 		}
 
 		this.framePerSec = framePerSec;
-		//var p = board.getPlayerBall();
-		//player = new BallViewInfo(p.getPos(), p.getRadius(),p.getPlayer(),p.getBallCollidedWith());
-
-
-
+		
 	}
 	
 
@@ -94,5 +90,14 @@ public class ViewModel {
 	public synchronized BallViewInfo getAiBall(){
 		return playersBalls.get(INDEX_AI_BALL);
 	}
+
+	public int getScoreHuman() {
+		return scoreHuman;
+	}
+
+	public int getScoreAI() {
+		return scoreAI;
+	}
+	
 	
 }

@@ -17,42 +17,54 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     private int numberOfUpdatersDone=0;
     private List<SimpleTurnImpl> statesOfUpdaters;
     private volatile boolean gameInProgress = true;
-
-    @Override
-    public synchronized boolean isGameInProgress() {
-        return gameInProgress;
+    private boolean parallelUpdatePhase = true;
+    
+    public MonitorUpdateBallsSimple(final Board board) {
+        this.board = board;
+        statesOfUpdaters = new ArrayList<>();
+        
     }
 
     @Override
-    public synchronized void stopGame() {
-        this.gameInProgress = false;
+    public synchronized boolean areAllUpdatersDone(){
+        return this.numberOfUpdatersDone == this.totalNumberOfUpdaters;
+    }
+
+    @Override
+    public synchronized boolean isParallelUpdatePhase(){
+        return this.parallelUpdatePhase;
+    }
+
+    @Override
+    public synchronized void stopParallelUpdsatePhase(){
+        this.parallelUpdatePhase=false;
+    }
+    
+    @Override
+    public synchronized void beginUpdatePhase(){
+        for(var t: this.statesOfUpdaters){
+            t.beginTurn();
+        }
+        this.numberOfUpdatersDone = 0;
+        this.parallelUpdatePhase = true;
         notifyAll();
     }
 
-    private int calculateScorePlayer(int player){
-        return this.board.getBalls()
-        .stream()
-        .filter(elem->!elem.isAlive())
-        .filter(elem->elem.getBallCollidedWith().isPresent())
-        .filter(elem->elem.getBallCollidedWith().get() == player)
-        .toList()
-        .size();
+    @Override
+    public synchronized void timeToStop(final int numberOfUpdater){
+        this.statesOfUpdaters.get(numberOfUpdater).stopTurn();
+        this.numberOfUpdatersDone+=1;
     }
 
     @Override
-    public int calculateAIScore() {
-        return calculateScorePlayer(INDEX_AI_BALL);
-    }
-
-    @Override
-    public synchronized int calculateHumanScore(){
-        return calculateScorePlayer(INDEX_HUMAN_BALL);
-    }
-
-    public MonitorUpdateBallsSimple(final Board board2) {
-        this.board = board2;
-        statesOfUpdaters = new ArrayList<>();
-        
+    public synchronized void waitForUpdatePhase(final int numberOfUpdater){
+        while((!this.statesOfUpdaters.get(numberOfUpdater).isTurn() || !isParallelUpdatePhase()) && isGameInProgress()){
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -71,6 +83,13 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
             this.board.getBalls().get(ballNumber).updateState(this.dt, board); 
         }
     }
+    
+    @Override
+    public void updateBallWithDt(final long dtime,final int ballNumber) {
+        if(this.board.getBalls().get(ballNumber).isAlive()){
+            this.board.getBalls().get(ballNumber).updateState(dtime, board); 
+        }
+    }
 
     @Override
     public void checkCollisionWithHoles(final int ballNumber) {
@@ -87,48 +106,24 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
 
     @Override
-    public synchronized void timeToStop(final int numberOfUpdater){
-        this.statesOfUpdaters.get(numberOfUpdater).stopTurn();
-        this.numberOfUpdatersDone+=1;
+    public synchronized boolean isGameInProgress() {
+        return gameInProgress;
     }
 
     @Override
-    public synchronized void waitForUpdatePhase(final int numberOfUpdater){
-        while(!this.statesOfUpdaters.get(numberOfUpdater).isTurn() && isGameInProgress()){
-            try {
-                
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        
-    }
-
-    @Override
-    public synchronized void beginUpdatePhase(){
-
-        for(int i = 0; i< this.totalNumberOfUpdaters;i++){
-            this.statesOfUpdaters.get(i).beginTurn();
-        }
-        this.numberOfUpdatersDone = 0;
+    public synchronized void stopGame() {
+        this.gameInProgress = false;
         notifyAll();
-
-    }
-
-    @Override
-    public synchronized void timeTiBegin(final int numberOfUpdater){
-        this.statesOfUpdaters.get(numberOfUpdater).beginTurn();
-    }
-
-    @Override
-    public synchronized boolean isTimeToRender(){
-        return this.numberOfUpdatersDone == this.totalNumberOfUpdaters;
     }
 
     @Override
     public synchronized boolean areAllBallsDead(){
         return this.board.getBalls().stream().filter(elem->elem.isAlive()).toList().size() == 0;
+    }
+
+    @Override
+    public synchronized void timeTiBegin(final int numberOfUpdater){
+        this.statesOfUpdaters.get(numberOfUpdater).beginTurn();
     }
 
     @Override
@@ -140,7 +135,5 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     public synchronized void updatePlayersBalls(){
         this.board.updateEveryPlayerBall(dt);
     }
-
-   
 
 }

@@ -4,14 +4,12 @@ public class MonitorGameStateImpl {
 
     private boolean gameInProgress = true;
 
-    public synchronized boolean isGameInProgress() {
-        System.err.println("NO IMPL");
-        return false;
+    public synchronized boolean isGameInProgress() { 
+        return gameInProgress;
     }
 
     public synchronized void stopGame() {
-         System.err.println("NO IMPL");
-       // this.gameInProgress = false;
+        gameInProgress = false;
     }
 
     

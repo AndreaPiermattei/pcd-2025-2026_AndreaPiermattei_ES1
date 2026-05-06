@@ -41,9 +41,9 @@ public class MassiveBoardConf implements BoardConf {
 	public List<Hole> getHoles() {
 		var holeRadius = 0.1;
         var holes = new ArrayList<Hole>();
-		var py =  0.025;
-    	for (int row = 0; row < 20; row++) {
-        	var px = -0.25 + row*0.025;
+		var py =  0.85;
+    	for (int row = 0; row < 2; row++) {
+        	var px = -0.88 + row*2;
         	var hole = new Hole(holeRadius, new P2d(px, py));
 			holes.add(hole);
     	}		

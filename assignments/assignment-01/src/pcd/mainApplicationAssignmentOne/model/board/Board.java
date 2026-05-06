@@ -6,6 +6,8 @@ import pcd.mainApplicationAssignmentOne.model.Hole;
 
 public class Board {
 
+    private int scorePlayer = 0;
+    private int scoreAI = 0;
 
     private static final int INDEX_HUMAN_BALL = 0;
     private static final int INDEX_AI_BALL = 1;
@@ -50,28 +52,6 @@ public class Board {
         this.holes = configurationOfBoard.getHoles();
     }
     
-    /*public void updateState(long dt) {
-
-    	playerBall.updateState(dt, this);      	
-    	
-    	for (int i = 0; i < balls.size() - 1; i++) {
-            for (int j = i + 1; j < balls.size(); j++) {
-                Ball.resolveCollision(balls.get(i), balls.get(j));
-            }
-        }
-    	for (var b: balls) {
-    		Ball.resolveCollision(playerBall, b);
-    	}
-
-        for(int i = 0; i<holes.size();i++){
-            for (int j = 0; j < balls.size(); j++) {
-                if(Hole.checkCollision(balls.get(j),holes.get(i))){
-                    balls.get(j).kill();
-                }
-            }
-        }
-    	   	    	
-    }*/
 
     public void updateControlledPlayerBall(final long dt){
         getHumanBall().updateState(dt, this);
@@ -97,28 +77,15 @@ public class Board {
                     Ball.resolveCollision(balls.get(i), balls.get(j));
             }
         }
-        /*for(int i = 0; i<holes.size();i++){
-            for (int j = 0; j < balls.size(); j++) {
-                if(Hole.checkCollision(balls.get(j),holes.get(i))){
-                    balls.get(j).kill();
-                }
-            }
-        }*/ //sostiyuito dal controllo fatto con i Updaters
     	for (var b: balls.stream().filter(ball -> ball.isAlive()).toList()) {
             playersBalls.forEach(player -> Ball.resolveCollision(player, b));
-    		//Ball.resolveCollision(playerBall, b);
     	} 
-
         Ball.resolveCollision(getHumanBall(), getAiBall());
     }
     
     public List<Ball> getBalls(){
     	return balls;
     }
-    
-    /*public Ball getPlayerBall() {
-    	return playerBall;
-    }*/
     
     public  Boundary getBounds(){
         return bounds;
@@ -138,6 +105,59 @@ public class Board {
 
     public Ball getAiBall(){
         return this.playersBalls.get(INDEX_AI_BALL);
+    }
+
+     private int calculateScorePlayer(final int player){
+        return getBalls()
+        .stream()
+        .filter(elem->!elem.isAlive())
+        .filter(elem->elem.getBallCollidedWith().isPresent())
+        .filter(elem->elem.getBallCollidedWith().get() == player)
+        .toList()
+        .size();
+    }
+
+    
+    private void updateAIScore() {
+        this.scoreAI = calculateScorePlayer(2);
+    }
+
+    
+    private void updateHumanScore(){
+        this.scorePlayer = calculateScorePlayer(1);
+    }
+
+    public void updateScores(){
+        this.updateAIScore();
+        this.updateHumanScore();
+    }
+
+    public int getScorePlayer() {
+        return scorePlayer;
+    }
+
+    public int getScoreAI() {
+        return scoreAI;
+    }
+
+    public void checkWhoWins(){
+
+        System.out.println("score:\n");
+        System.out.println("AI:"+this.scoreAI);
+        System.out.println("human:"+this.scorePlayer);
+        if(!getAiBall().isAlive()){
+            System.out.println("ai dead - human wins");
+        
+        }else if(!getHumanBall().isAlive()){
+            System.out.println("human dead - ai wins");
+        }else if(this.scoreAI > this.scorePlayer){
+           System.out.println("ai wins");
+        }else if(this.scoreAI < this.scorePlayer){
+            System.out.println("human wins");
+        }else{
+            System.out.println("TIE");
+        }
+
     }
 
 }

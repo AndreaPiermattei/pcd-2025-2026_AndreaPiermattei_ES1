@@ -18,5 +18,9 @@ public class MonitorBallOfAI {
     public synchronized boolean isBallMoving(){
         return this.board.getAiBall().getVel().abs() >= 0.05;
     }
+
+    public synchronized void update(final long dt){
+        this.board.updateBallAI(dt);
+    }
     
 }

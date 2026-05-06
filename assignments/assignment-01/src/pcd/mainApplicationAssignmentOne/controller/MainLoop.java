@@ -74,7 +74,7 @@ public class MainLoop extends Thread{
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         
-        this.board.init("S");
+        this.board.init("L");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAI(board);
@@ -99,13 +99,13 @@ public class MainLoop extends Thread{
     }
 
     public void run(){
-        var aiBall = this.board.getAiBall();
+        //var aiBall = this.board.getAiBall();
         //waitAbit();
         var startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
 		var t0 = System.currentTimeMillis();
 		var lastUpdateTime = System.currentTimeMillis();
-        var lastKickTime = t0;
+        //var lastKickTime = t0;
         try{
             final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
@@ -143,8 +143,9 @@ public class MainLoop extends Thread{
 			}	
 			/* update board state */
 
-            this.board.updateEveryPlayerBall(elapsed);
-            
+            //this.board.updateEveryPlayerBall(elapsed);
+            this.monitorBallAI.update(elapsed);
+            this.board.updateHumanBall(elapsed);
             /*the passive balls on board have been updated, thus we need
             to check the collisions sequentially */
             if(this.monitorBalls.areAllUpdatersDone()){
@@ -177,7 +178,12 @@ public class MainLoop extends Thread{
             //debugForceGameOver(startForcedGameOver);
 
         }
-        
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         this.board.checkWhoWins();
         try {
             sleep(4000);

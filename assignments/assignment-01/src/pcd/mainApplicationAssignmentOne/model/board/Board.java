@@ -70,6 +70,26 @@ public class Board {
 
     }
 
+    public void updateBallAI(final long dt){
+        var p = getAiBall();
+        p.updateState(dt, this);
+        for(var h: this.holes){
+            if(Hole.checkCollision(p, h)){
+                p.kill();
+            }
+        }
+    }
+
+    public void updateHumanBall(final long dt){
+        var p = getHumanBall();
+        p.updateState(dt, this);
+        for(var h: this.holes){
+            if(Hole.checkCollision(p, h)){
+                p.kill();
+            }
+        }
+    }
+
     public void updateStateCollisions(){
         for (int i = 0; i < balls.size() - 1; i++) {
             for (int j = i + 1; j < balls.size(); j++) {

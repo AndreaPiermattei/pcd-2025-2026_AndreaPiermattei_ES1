@@ -48,7 +48,6 @@ public class Board {
 
         this.playersBalls = configurationOfBoard.getPlayersBalls();
     	this.balls = configurationOfBoard.getSmallBalls();    	
-    	//this.playerBall = configurationOfBoard.getPlayerBall(); 
     	this.bounds = configurationOfBoard.getBoardBoundary();
         this.holes = configurationOfBoard.getHoles();
     }

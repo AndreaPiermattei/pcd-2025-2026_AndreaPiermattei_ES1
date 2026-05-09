@@ -105,8 +105,9 @@ public class MainLoop extends Thread{
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
             launchUpdaters(threadsCreated);
 
-            final DumbEnemyAI ai = new DumbEnemyAI("stupidAI-th", true, monitorBallAI,monitorGame);
+            final DumbEnemyAI ai = new DumbEnemyAI("AI-dumb", debug, monitorBallAI,monitorGame);
             ai.start();
+            
         }catch(Exception e){
             e.printStackTrace();
             
@@ -118,7 +119,7 @@ public class MainLoop extends Thread{
         this.viewModel.update(board, 0);			
 		this.view.render();
 		
-        System.out.println("BEGIN GAME");
+        System.out.println("\nBEGIN GAME\n");
         while(monitorGame.isGameInProgress()){
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();		
@@ -133,11 +134,21 @@ public class MainLoop extends Thread{
 			}	
 			/* update players state */
 
-            this.monitorBallAI.update(elapsed); //ensures mutual exclusion on AIball (MainLoop and DumbEnemyAI are threads that modify the ball)
+            //the use of a simple monitor (monitorBallAI)
+            // ensures mutual exclusion on AIball 
+            //(MainLoop and DumbEnemyAI are threads 
+            // that could  modify the ball at the same time)
+            this.monitorBallAI.update(elapsed); 
+
+            //player ball doesn't need any monitor since
+            //  only mainthreads modifies the ball
             this.board.updateHumanBall(elapsed);
 
-            /*the passive balls on board have been updated, now we can
-            to check the collisions sequentially */
+            /*the passive balls on 
+            board have been updated, 
+            now we can
+            to check the collisions 
+            sequentially */
             if(this.monitorBalls.areAllUpdatersDone()){
                 this.monitorBalls.stopParallelUpdsatePhase();
                 this.board.updateStateCollisions(); 
@@ -155,11 +166,9 @@ public class MainLoop extends Thread{
                 viewModel.update(board, framePerSec);			
                 view.render();
                 
-                if(this.monitorBalls.areAllBallsDead() || 
-                    !this.board.getAiBall().isAlive() || 
-                    !this.board.getHumanBall().isAlive()){
-                        this.monitorBalls.informGameOver();
-                        this.monitorGame.stopGame();
+                if(areGameOverConditionsTrue()){
+                    this.monitorBalls.informGameOver();
+                    this.monitorGame.stopGame();
                 }else{
                     this.monitorBalls.beginUpdatePhase();
                 }
@@ -185,6 +194,12 @@ public class MainLoop extends Thread{
         }
         System.exit(0);
 
+    }
+
+    private boolean areGameOverConditionsTrue() {
+        return this.monitorBalls.areAllBallsDead() || 
+            !this.board.getAiBall().isAlive() || 
+            !this.board.getHumanBall().isAlive();
     }
 
     private synchronized void debugForceGameOver(long beginTime) {

@@ -51,7 +51,7 @@ public class DumbEnemyAI extends Thread{
 				lastKicked = System.currentTimeMillis();
 			}    
 		}	
-        System.out.println(this.getName()+" shutting down");	
+        System.out.println("#-"+this.getName()+" shutting down");	
 	}
 
 }

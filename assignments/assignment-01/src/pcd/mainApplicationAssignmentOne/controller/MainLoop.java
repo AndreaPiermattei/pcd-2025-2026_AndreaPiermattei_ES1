@@ -5,13 +5,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.controller.interfaces.Cmd;
 import pcd.mainApplicationAssignmentOne.model.DumbEnemyAI;
-import pcd.mainApplicationAssignmentOne.model.MonitorBallOfAI;
-import pcd.mainApplicationAssignmentOne.model.MonitorGameStateImpl;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
-import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
-import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorBallOfAI;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorGameState;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorUpdateBalls;
+import pcd.mainApplicationAssignmentOne.model.monitors.MonitorBallOfAIImpl;
+import pcd.mainApplicationAssignmentOne.model.monitors.MonitorGameStateImpl;
+import pcd.mainApplicationAssignmentOne.model.monitors.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBufferPollImpl;
 import pcd.mainApplicationAssignmentOne.view.View;
@@ -23,12 +26,12 @@ public class MainLoop extends Thread{
     Random rand = new Random(6969420);
     private final Board board = new Board();
     private MonitorUpdateBalls monitorBalls;
-    private MonitorGameStateImpl monitorGame;
+    private MonitorGameState monitorGame;
     private MonitorBallOfAI monitorBallAI;
     private final ViewModel viewModel = new ViewModel();
 	private final View view = new View(viewModel, 1200, 800, this);
 
-    private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameStateImpl monitorGame){
+    private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameState monitorGame){
        
         final var numberOfProcessors = Runtime.getRuntime().availableProcessors();
         final var numberOfBallsOnBoard = board.getBalls().size();
@@ -76,7 +79,7 @@ public class MainLoop extends Thread{
         this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
-        this.monitorBallAI = new MonitorBallOfAI(board);
+        this.monitorBallAI = new MonitorBallOfAIImpl(board);
     }
 
     public void notifyNewCmd(Cmd cmd) {
@@ -89,24 +92,14 @@ public class MainLoop extends Thread{
 		}
 	}
 
-    /*private double chooseRandomAngle(){
-       return rand.nextDouble()*Math.PI*0.25; 
-    }
-
-    private V2d calculateVelocityVector(final double angle){
-        return new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
-    }*/
-
     public void run(){
-        //var aiBall = this.board.getAiBall();
-        //waitAbit();
+
         var debug = false;
         
         var startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
 		var t0 = System.currentTimeMillis();
 		var lastUpdateTime = System.currentTimeMillis();
-        //var lastKickTime = t0;
         try{
             final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
@@ -129,10 +122,6 @@ public class MainLoop extends Thread{
         while(monitorGame.isGameInProgress()){
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
 			lastUpdateTime = System.currentTimeMillis();		
-            /*if (aiBall.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTime > 700) {
-				aiBall.kick(calculateVelocityVector(chooseRandomAngle()));
-				lastKickTime = System.currentTimeMillis();
-			}*/
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
@@ -146,7 +135,8 @@ public class MainLoop extends Thread{
 
             this.monitorBallAI.update(elapsed); //ensures mutual exclusion on AIball (MainLoop and DumbEnemyAI are threads that modify the ball)
             this.board.updateHumanBall(elapsed);
-            /*the passive balls on board have been updated, thus we need
+
+            /*the passive balls on board have been updated, now we can
             to check the collisions sequentially */
             if(this.monitorBalls.areAllUpdatersDone()){
                 this.monitorBalls.stopParallelUpdsatePhase();
@@ -185,7 +175,6 @@ public class MainLoop extends Thread{
         try {
             sleep(500);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         this.board.checkWhoWins();
@@ -201,7 +190,7 @@ public class MainLoop extends Thread{
     private synchronized void debugForceGameOver(long beginTime) {
         if(System.currentTimeMillis()-beginTime > 15_000){
             System.out.println("kill all");
-            //this.board.getBalls().stream().forEach(elem->elem.kill());
+            this.board.getBalls().stream().forEach(elem->elem.kill());
             this.monitorGame.stopGame();
             this.monitorBalls.informGameOver();
         }

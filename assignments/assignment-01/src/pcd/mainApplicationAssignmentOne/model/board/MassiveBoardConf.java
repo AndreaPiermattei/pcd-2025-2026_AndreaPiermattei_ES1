@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.Hole;
+import pcd.mainApplicationAssignmentOne.model.interfaces.BoardConf;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 

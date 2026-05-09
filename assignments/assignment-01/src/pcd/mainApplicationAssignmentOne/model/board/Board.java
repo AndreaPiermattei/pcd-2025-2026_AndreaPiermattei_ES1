@@ -3,6 +3,7 @@ package pcd.mainApplicationAssignmentOne.model.board;
 import java.util.*;
 import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.Hole;
+import pcd.mainApplicationAssignmentOne.model.interfaces.BoardConf;
 
 public class Board {
 

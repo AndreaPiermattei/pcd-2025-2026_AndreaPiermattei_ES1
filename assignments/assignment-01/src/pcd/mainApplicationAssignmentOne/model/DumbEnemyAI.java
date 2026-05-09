@@ -2,6 +2,8 @@ package pcd.mainApplicationAssignmentOne.model;
 
 import java.util.Random;
 
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorBallOfAI;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorGameState;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 
 public class DumbEnemyAI extends Thread{
@@ -10,9 +12,9 @@ public class DumbEnemyAI extends Thread{
     private final boolean debugMode;
     private final Random rand = new Random(System.currentTimeMillis());
     private final MonitorBallOfAI monitorBall;
-    private final MonitorGameStateImpl monitorGame;
+    private final MonitorGameState monitorGame;
 
-    public DumbEnemyAI(final String name, final Boolean isInDebug, final MonitorBallOfAI monitorBall, final MonitorGameStateImpl monitorGame){
+    public DumbEnemyAI(final String name, final Boolean isInDebug, final MonitorBallOfAI monitorBall, final MonitorGameState monitorGame){
         this.setName(name);
         this.debugMode = isInDebug;
         this.monitorBall = monitorBall;
@@ -28,8 +30,8 @@ public class DumbEnemyAI extends Thread{
         return new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
     }
 
-    private long isTimeToKick(long lastKicked) {
-        return System.currentTimeMillis() - lastKicked;
+    private boolean isTimeToKick(long lastKicked) {
+        return (System.currentTimeMillis() - lastKicked)> WAITING_TIME;
     }
 
     private void makeRandomMovement(){
@@ -44,12 +46,10 @@ public class DumbEnemyAI extends Thread{
     public void run() {
         var lastKicked = System.currentTimeMillis();
 		while (monitorGame.isGameInProgress()) {
-            //sleepFor(WAITING_TIME);
-            if (isTimeToKick(lastKicked) > WAITING_TIME && !monitorBall.isBallMoving()) {
+            if (isTimeToKick(lastKicked) && !monitorBall.isBallMoving()) {
                 this.makeRandomMovement();
 				lastKicked = System.currentTimeMillis();
-			}
-            
+			}    
 		}	
         System.out.println(this.getName()+" shutting down");	
 	}

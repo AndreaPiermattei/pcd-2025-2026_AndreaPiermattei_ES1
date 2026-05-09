@@ -1,18 +1,19 @@
 package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
-import pcd.mainApplicationAssignmentOne.model.MonitorGameStateImpl;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorGameState;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorUpdateBalls;
 
 public class BallUpdater extends Thread{
 
     private final MonitorUpdateBalls monitorParallelUpdateBall;
-    private final MonitorGameStateImpl monitorGame;
+    private final MonitorGameState monitorGame;
     private final int indexFirstBall;
     private final int indexLastBall;
     private int currentBallIndex;
     private final int thradNumber;
     private final int numberOfBallsForUpdater;
 
-    public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final  MonitorGameStateImpl monitorGame, final int indexFirstBall, final int indexLastBall) {
+    public BallUpdater(final int numberThread, final MonitorUpdateBalls monitorParallelUpdateBall, final  MonitorGameState monitorGame, final int indexFirstBall, final int indexLastBall) {
         this.setName("Updater_N."+numberThread);
         this.monitorGame = monitorGame;
         this.thradNumber = numberThread;

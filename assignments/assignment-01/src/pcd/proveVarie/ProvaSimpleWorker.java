@@ -40,7 +40,6 @@ public class ProvaSimpleWorker extends Thread{
 
             sleep(rnad.nextLong(200,3501));
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

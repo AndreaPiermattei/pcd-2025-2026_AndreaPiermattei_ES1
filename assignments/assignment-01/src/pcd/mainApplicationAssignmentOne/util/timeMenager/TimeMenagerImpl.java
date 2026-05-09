@@ -2,14 +2,14 @@ package pcd.mainApplicationAssignmentOne.util.timeMenager;
 
 public class TimeMenagerImpl implements TimeMenager{
 
-    private int nFrames = 0;
-	private long t0;
+    //private int nFrames = 0;
+	//private long t0;
 	private long lastUpdateTime;
     private long elapsed;
 
      @Override
     public void init() {
-        this.t0 = System.currentTimeMillis();
+        //this.t0 = System.currentTimeMillis();
         this.lastUpdateTime = System.currentTimeMillis();
         this.elapsed = System.currentTimeMillis();
     }

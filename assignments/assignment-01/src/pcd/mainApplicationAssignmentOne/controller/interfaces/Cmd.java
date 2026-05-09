@@ -1,4 +1,4 @@
-package pcd.mainApplicationAssignmentOne.controller;
+package pcd.mainApplicationAssignmentOne.controller.interfaces;
 
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 

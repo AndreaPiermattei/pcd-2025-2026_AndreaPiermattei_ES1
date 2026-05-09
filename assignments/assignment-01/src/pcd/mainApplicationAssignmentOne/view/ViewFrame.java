@@ -15,7 +15,6 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import pcd.mainApplicationAssignmentOne.RenderSynch;
 import pcd.mainApplicationAssignmentOne.controller.KickBallCmd;
 import pcd.mainApplicationAssignmentOne.controller.MainLoop;
 import pcd.mainApplicationAssignmentOne.controller.SimplePrintCmd;
@@ -42,14 +41,12 @@ public class ViewFrame extends JFrame implements KeyListener{
         setResizable(false);
         panel = new VisualiserPanel(w,h);
         getContentPane().add(panel);
-        /* new code */
 
 		this.addKeyListener(this);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		requestFocusInWindow(); 
 
-		/* end: new code */
 		addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent ev){
 				System.exit(-1);

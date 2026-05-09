@@ -1,4 +1,4 @@
-package pcd.mainApplicationAssignmentOne;
+package pcd.mainApplicationAssignmentOne.view;
 
 public class RenderSynch {
 

@@ -1,10 +1,13 @@
-package pcd.mainApplicationAssignmentOne.model.ballUpdater;
+package pcd.mainApplicationAssignmentOne.model.monitors;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pcd.mainApplicationAssignmentOne.model.Hole;
+import pcd.mainApplicationAssignmentOne.model.ballUpdater.SimpleTurnImpl;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
+import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorUpdateBalls;
+import pcd.mainApplicationAssignmentOne.model.interfaces.Turn;
 
 public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
 
@@ -39,7 +42,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     
     @Override
     public synchronized void beginUpdatePhase(){
-        for(var t: this.statesOfUpdaters){
+        for(Turn t: this.statesOfUpdaters){
             if(!t.hasStopedPermanently()){
                 t.beginTurn();
                 this.numberOfUpdatersDone -= 1;

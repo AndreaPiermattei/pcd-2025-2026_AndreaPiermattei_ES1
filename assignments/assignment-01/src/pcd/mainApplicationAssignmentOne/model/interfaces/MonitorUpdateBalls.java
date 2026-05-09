@@ -1,4 +1,4 @@
-package pcd.mainApplicationAssignmentOne.model.ballUpdater;
+package pcd.mainApplicationAssignmentOne.model.interfaces;
 
 public interface MonitorUpdateBalls {
 

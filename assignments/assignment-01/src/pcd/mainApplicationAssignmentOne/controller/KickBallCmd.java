@@ -1,5 +1,6 @@
 package pcd.mainApplicationAssignmentOne.controller;
 
+import pcd.mainApplicationAssignmentOne.controller.interfaces.Cmd;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 

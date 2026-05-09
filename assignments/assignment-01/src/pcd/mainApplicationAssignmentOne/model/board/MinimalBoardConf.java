@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import pcd.mainApplicationAssignmentOne.model.Ball;
 import pcd.mainApplicationAssignmentOne.model.Hole;
+import pcd.mainApplicationAssignmentOne.model.interfaces.BoardConf;
 import pcd.mainApplicationAssignmentOne.util.P2d;
 import pcd.mainApplicationAssignmentOne.util.V2d;
 
@@ -46,7 +47,6 @@ public class MinimalBoardConf implements BoardConf {
 
 	@Override
 	public List<Ball> getPlayersBalls() {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'getPlayersBalls'");
 	}
 

@@ -10,7 +10,7 @@ public interface MonitorUpdateBalls {
     void waitForUpdatePhase(int numberOfUpdater);
     void beginUpdatePhase();
     boolean areAllUpdatersDone();
-    void checkCollisionWithHoles(int ballNumber);
+    boolean checkCollisionWithHoles(int ballNumber);
     boolean areAllBallsDead();
     void resolveCollisionsBalls();
     void updatePlayersBalls();
@@ -19,4 +19,5 @@ public interface MonitorUpdateBalls {
     void updateBallWithDt(long dtime, int ballNumber);
     void informGameOver();
     boolean isGameInProgress();
+    void timeToStopPermanent(int numberOfUpdater);
 }

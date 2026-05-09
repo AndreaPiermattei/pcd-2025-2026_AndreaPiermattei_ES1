@@ -2,6 +2,7 @@ package pcd.mainApplicationAssignmentOne.model.ballUpdater;
 
 public class SimpleTurnImpl {
     private boolean turn = true;
+    private boolean permanentStop = false;
 
     public boolean isTurn() {
         return turn;
@@ -15,5 +16,11 @@ public class SimpleTurnImpl {
         this.turn = true;
     }
 
+    public void stopPermanent(){
+        this.permanentStop = true;
+    }
     
+    public boolean hasStopedPermanently(){
+        return this.permanentStop;
+    }
 }

@@ -8,10 +8,12 @@ public class KickBallCmd implements Cmd{
     private final String name;
     private final double speedfactor;
     private final V2d directionKick;
+    private final boolean debug;
 
     public KickBallCmd(final String direction, final double speed){
         this.name = direction;
         this.speedfactor = speed;
+        this.debug = false;
         switch (direction) {
             case "UP":
                 this.directionKick = new V2d(0, 1);
@@ -33,7 +35,8 @@ public class KickBallCmd implements Cmd{
 
     @Override
     public void execute(final Board model) {
-        //simplelog
+        if(this.debug)
+            simpleLog();
         model.getHumanBall().kick(this.directionKick.mul(this.speedfactor));
     }
 

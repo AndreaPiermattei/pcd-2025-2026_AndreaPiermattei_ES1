@@ -6,7 +6,6 @@ public class TimeMenagerImpl implements TimeMenager{
 	private long t0;
 	private long lastUpdateTime;
     private long elapsed;
-    private int framePerSec;
 
      @Override
     public void init() {

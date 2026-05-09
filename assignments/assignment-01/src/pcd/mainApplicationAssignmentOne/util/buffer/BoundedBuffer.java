@@ -9,5 +9,7 @@ public interface BoundedBuffer<Item> {
     Item get() throws InterruptedException;
 
     Optional<Item> poll() throws InterruptedException;
+
+    void deleteALL();
     
 }

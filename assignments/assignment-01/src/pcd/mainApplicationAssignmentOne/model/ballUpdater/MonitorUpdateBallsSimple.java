@@ -40,9 +40,14 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     @Override
     public synchronized void beginUpdatePhase(){
         for(var t: this.statesOfUpdaters){
-            t.beginTurn();
+            if(!t.hasStopedPermanently()){
+                t.beginTurn();
+                this.numberOfUpdatersDone -= 1;
+            }
         }
-        this.numberOfUpdatersDone = 0;
+        if(this.numberOfUpdatersDone<0) //just to be safe
+            this.numberOfUpdatersDone=0;
+        //this.numberOfUpdatersDone = 0;
         this.parallelUpdatePhase = true;
         notifyAll();
     }
@@ -50,6 +55,12 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     @Override
     public synchronized void timeToStop(final int numberOfUpdater){
         this.statesOfUpdaters.get(numberOfUpdater).stopTurn();
+        this.numberOfUpdatersDone+=1;
+    }
+
+    @Override
+    public synchronized void timeToStopPermanent(final int numberOfUpdater){
+        this.statesOfUpdaters.get(numberOfUpdater).stopPermanent();
         this.numberOfUpdatersDone+=1;
     }
 
@@ -89,12 +100,17 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
 
     @Override
-    public void checkCollisionWithHoles(final int ballNumber) {
+    public boolean checkCollisionWithHoles(final int ballNumber) {
+        if(!this.board.getBalls().get(ballNumber).isAlive())
+            return false;
+        
         for(var hole : this.board.getHoles()){
             if(Hole.checkCollision(this.board.getBalls().get(ballNumber), hole)) {
                 this.board.getBalls().get(ballNumber).kill();
+                return true;
             }   
         }
+        return false;
     }
 
     @Override

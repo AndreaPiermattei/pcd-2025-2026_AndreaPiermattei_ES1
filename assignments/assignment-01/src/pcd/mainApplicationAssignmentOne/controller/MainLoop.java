@@ -12,7 +12,6 @@ import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBalls;
 import pcd.mainApplicationAssignmentOne.model.ballUpdater.MonitorUpdateBallsSimple;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
-import pcd.mainApplicationAssignmentOne.util.V2d;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBufferPollImpl;
 import pcd.mainApplicationAssignmentOne.view.View;
@@ -74,7 +73,7 @@ public class MainLoop extends Thread{
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
         
-        this.board.init("L");
+        this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAI(board);
@@ -90,17 +89,19 @@ public class MainLoop extends Thread{
 		}
 	}
 
-    private double chooseRandomAngle(){
+    /*private double chooseRandomAngle(){
        return rand.nextDouble()*Math.PI*0.25; 
     }
 
     private V2d calculateVelocityVector(final double angle){
         return new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
-    }
+    }*/
 
     public void run(){
         //var aiBall = this.board.getAiBall();
         //waitAbit();
+        var debug = false;
+        
         var startForcedGameOver = System.currentTimeMillis();
         int nFrames = 0;
 		var t0 = System.currentTimeMillis();
@@ -111,7 +112,7 @@ public class MainLoop extends Thread{
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
             launchUpdaters(threadsCreated);
 
-            final DumbEnemyAI ai = new DumbEnemyAI("stupidAI-th", true, monitorBallAI);
+            final DumbEnemyAI ai = new DumbEnemyAI("stupidAI-th", true, monitorBallAI,monitorGame);
             ai.start();
         }catch(Exception e){
             e.printStackTrace();
@@ -141,10 +142,9 @@ public class MainLoop extends Thread{
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}	
-			/* update board state */
+			/* update players state */
 
-            //this.board.updateEveryPlayerBall(elapsed);
-            this.monitorBallAI.update(elapsed);
+            this.monitorBallAI.update(elapsed); //ensures mutual exclusion on AIball (MainLoop and DumbEnemyAI are threads that modify the ball)
             this.board.updateHumanBall(elapsed);
             /*the passive balls on board have been updated, thus we need
             to check the collisions sequentially */
@@ -175,9 +175,13 @@ public class MainLoop extends Thread{
                 }
                
             }
-            //debugForceGameOver(startForcedGameOver);
+            if(debug)
+                debugForceGameOver(startForcedGameOver);
 
         }
+
+        bufferInputCommands.deleteALL();
+
         try {
             sleep(500);
         } catch (InterruptedException e) {
@@ -199,11 +203,7 @@ public class MainLoop extends Thread{
             System.out.println("kill all");
             //this.board.getBalls().stream().forEach(elem->elem.kill());
             this.monitorGame.stopGame();
+            this.monitorBalls.informGameOver();
         }
-    }
-
-    private void log(String msg) {
-		System.out.println("[ " + System.currentTimeMillis() + "]["+this.getName()+ "]" + msg);
-	}
-    
+    }    
 }

@@ -9,21 +9,16 @@ public class DumbEnemyAI extends Thread{
     private final static long WAITING_TIME = 3_000;
     private final boolean debugMode;
     private final Random rand = new Random(System.currentTimeMillis());
-    private final MonitorBallOfAI monitor;
+    private final MonitorBallOfAI monitorBall;
+    private final MonitorGameStateImpl monitorGame;
 
-    public DumbEnemyAI(final String name, final Boolean isInDebug, final MonitorBallOfAI monitor){
+    public DumbEnemyAI(final String name, final Boolean isInDebug, final MonitorBallOfAI monitorBall, final MonitorGameStateImpl monitorGame){
         this.setName(name);
         this.debugMode = isInDebug;
-        this.monitor = monitor;
+        this.monitorBall = monitorBall;
+        this.monitorGame = monitorGame;
     }
 
-    private void sleepFor(long millis){
-        try {
-            Thread.sleep(millis);
-        } catch (Exception ex) {
-            System.err.println(ex);
-        }
-    }
 
     private double chooseRandomAngle(){
        return rand.nextDouble()*Math.PI*0.25; 
@@ -33,32 +28,30 @@ public class DumbEnemyAI extends Thread{
         return new V2d(Math.cos(angle),Math.sin(angle)).mul(1.5);
     }
 
-    private void decideIfTimeToKick(){
-
+    private long isTimeToKick(long lastKicked) {
+        return System.currentTimeMillis() - lastKicked;
     }
-    
+
     private void makeRandomMovement(){
         if(this.debugMode) 
-            System.err.println(this.getName()+": choosing move");
+            System.out.println(this.getName()+": choosing move");
 		var vectorVelocity = this.calculateVelocityVector(this.chooseRandomAngle());
         if(this.debugMode)
-            System.err.println(this.getName()+" has chosen: velocity-> "+vectorVelocity); 
-        
-        
-        monitor.kickBallAI(vectorVelocity);
+            System.out.println(this.getName()+" has chosen: velocity-> "+vectorVelocity); 
+        monitorBall.kickBallAI(vectorVelocity);
     }
 
     public void run() {
         var lastKicked = System.currentTimeMillis();
-		while (true) {
+		while (monitorGame.isGameInProgress()) {
             //sleepFor(WAITING_TIME);
-            if (System.currentTimeMillis() - lastKicked > WAITING_TIME && !monitor.isBallMoving()) {
+            if (isTimeToKick(lastKicked) > WAITING_TIME && !monitorBall.isBallMoving()) {
                 this.makeRandomMovement();
 				lastKicked = System.currentTimeMillis();
 			}
             
-		}		
+		}	
+        System.out.println(this.getName()+" shutting down");	
 	}
-	
-    
+
 }

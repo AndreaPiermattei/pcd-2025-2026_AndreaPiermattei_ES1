@@ -7,6 +7,7 @@ public abstract class AbstractBoundedBuffer<Item> implements BoundedBuffer<Item>
     protected LinkedList<Item> buffer;
 	protected int maxSize;
 
+	@Override
 	public synchronized void put(Item item) throws InterruptedException {
 		while (isFull()) {
 			wait();
@@ -15,6 +16,7 @@ public abstract class AbstractBoundedBuffer<Item> implements BoundedBuffer<Item>
 		notifyAll();
 	}
 
+	@Override
 	public synchronized Item get() throws InterruptedException {
 		while (isEmpty()) {
 			wait();
@@ -30,6 +32,11 @@ public abstract class AbstractBoundedBuffer<Item> implements BoundedBuffer<Item>
 
 	protected boolean isEmpty() {
 		return buffer.size() == 0;
+	}
+
+	@Override
+	public void deleteALL(){
+		buffer.clear();
 	}
 
     public abstract Optional<Item> poll() throws InterruptedException;

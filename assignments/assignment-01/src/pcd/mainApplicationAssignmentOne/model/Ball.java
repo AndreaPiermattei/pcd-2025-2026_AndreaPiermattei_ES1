@@ -1,6 +1,5 @@
 package pcd.mainApplicationAssignmentOne.model;
 
-import java.awt.IllegalComponentStateException;
 import java.util.Optional;
 
 import pcd.mainApplicationAssignmentOne.model.board.Board;

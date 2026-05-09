@@ -75,7 +75,7 @@ public class Board {
         p.updateState(dt, this);
         for(var h: this.holes){
             if(Hole.checkCollision(p, h)){
-                p.kill();
+               p.kill();
             }
         }
     }

@@ -4,10 +4,10 @@ import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorGameState;
 
 public class MonitorGameStateImpl implements MonitorGameState {
 
-    private boolean gameInProgress = true;
+    private volatile boolean gameInProgress = true;
 
     @Override
-    public synchronized boolean isGameInProgress() { 
+    public boolean isGameInProgress() { 
         return gameInProgress;
     }
     @Override

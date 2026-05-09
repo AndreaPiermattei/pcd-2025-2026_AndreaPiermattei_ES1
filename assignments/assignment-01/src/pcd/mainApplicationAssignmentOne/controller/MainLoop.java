@@ -75,7 +75,6 @@ public class MainLoop extends Thread{
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
-        
         this.board.init("S");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
@@ -131,7 +130,8 @@ public class MainLoop extends Thread{
                 }
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}	
+			}
+        
 			/* update players state */
 
             //the use of a simple monitor (monitorBallAI)

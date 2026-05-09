@@ -122,7 +122,7 @@ public class MonitorUpdateBallsSimple implements MonitorUpdateBalls {
     }
     
     @Override
-    public synchronized boolean isGameInProgress() {
+    public boolean isGameInProgress() {
         return gameInProgress;
     }
     @Override

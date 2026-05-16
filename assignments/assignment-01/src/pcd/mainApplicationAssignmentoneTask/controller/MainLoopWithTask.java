@@ -1,5 +1,7 @@
 package pcd.mainApplicationAssignmentoneTask.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -7,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import pcd.mainApplicationAssignmentOne.controller.interfaces.Cmd;
 import pcd.mainApplicationAssignmentOne.model.DumbEnemyAI;
+import pcd.mainApplicationAssignmentOne.model.ballUpdater.BallUpdater;
 import pcd.mainApplicationAssignmentOne.model.board.Board;
 import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorBallOfAI;
 import pcd.mainApplicationAssignmentOne.model.interfaces.MonitorGameState;
@@ -41,7 +44,7 @@ public class MainLoopWithTask{
         this.monitorBalls = new MonitorUpdateBallsTaskImpl(board, numTasks);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAIImpl(board);
-        numTasks = Runtime.getRuntime().availableProcessors();
+        numTasks = Runtime.getRuntime().availableProcessors()+1;
         executor = Executors.newFixedThreadPool(numTasks);
     }
 
@@ -78,7 +81,34 @@ public class MainLoopWithTask{
 
     }
 
-    private void executeUpdatersV2(){
+    private void executeUpdatersV2(final long lastUpdateTime){
+
+        final var numberOfBallsOnBoard = board.getBalls().stream().filter(b->b.isAlive()).toList().size(); 
+        //makes sure to destribute dinamically balls to tasks as musch as possible
+
+        int numberOfTasks=0;
+        Double ballsPerThread = ((numberOfBallsOnBoard*1.0)/(numTasks*1.0));
+        
+        if(ballsPerThread.compareTo(1.0) <= 0){
+            numberOfTasks = numberOfBallsOnBoard;
+            for(int i = 0; i < numberOfTasks; i++){
+                executor.execute(new UpdateBallTask(monitorBalls, i, i, lastUpdateTime));
+            }
+        }else{
+            var integerBallsPerThread = ballsPerThread.intValue()+1;
+            var firstBall = 0;
+            var lastBall = 0;
+            for(int i = 0; i <numTasks; i++){
+                if(firstBall < numberOfBallsOnBoard){
+                    lastBall = firstBall+integerBallsPerThread-1;
+                    if(lastBall >= numberOfBallsOnBoard){
+                        lastBall = numberOfBallsOnBoard-1;
+                    }
+                    executor.execute(new UpdateBallTask(monitorBalls, firstBall, lastBall, lastUpdateTime));
+                    firstBall = firstBall+integerBallsPerThread;
+                }
+            }
+        }
 
     }
 

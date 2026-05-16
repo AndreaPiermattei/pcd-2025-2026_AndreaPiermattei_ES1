@@ -58,4 +58,8 @@ public class MonitorUpdateBallsTaskImpl implements MonitorUpdateBallsTask {
         this.totalNumberOfUpdaters = actualNumberOfUpdaters;
     }
 
+    @Override
+    public void resolveCollisions(){
+        this.board.updateStateCollisions();
+    }
 }

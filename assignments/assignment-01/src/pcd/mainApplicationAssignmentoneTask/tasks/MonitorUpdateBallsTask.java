@@ -16,4 +16,6 @@ public interface MonitorUpdateBallsTask {
 
     void updateNumberOfThreads(int actualNumberOfUpdaters);
 
+    void resolveCollisions();
+
 }

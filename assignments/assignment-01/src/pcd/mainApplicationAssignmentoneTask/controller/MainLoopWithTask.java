@@ -44,7 +44,7 @@ public class MainLoopWithTask{
         this.monitorBalls = new MonitorUpdateBallsTaskImpl(board, numTasks);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAIImpl(board);
-        numTasks = Runtime.getRuntime().availableProcessors()+1;
+        numTasks = Runtime.getRuntime().availableProcessors();
         executor = Executors.newFixedThreadPool(numTasks);
     }
 
@@ -131,7 +131,7 @@ public class MainLoopWithTask{
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
             if(phaseUpdate){
                 phaseUpdate = false;
-                executeUpdaters(lastUpdateTime);
+                executeUpdatersV2(lastUpdateTime);
             }
                 
             try {

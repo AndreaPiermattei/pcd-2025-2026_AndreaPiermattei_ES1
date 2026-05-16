@@ -21,14 +21,14 @@ public class UpdateBallTask implements Runnable{
     @Override
     public void run() {
         long elapsed = System.currentTimeMillis() - lastUpdateTime;
-        System.out.println("begin update balls");
+        //System.out.println("begin update balls");
         for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
             
             this.monitorParallelUpdateBall.updateBallWithDt(elapsed,this.currentBallIndex);
             this.monitorParallelUpdateBall.checkCollisionWithHoles(this.currentBallIndex);
         }   
         this.monitorParallelUpdateBall.timeToStop(); 
-        System.out.println("pausing"); 
+       // System.out.println("pausing"); 
     }
     
 }

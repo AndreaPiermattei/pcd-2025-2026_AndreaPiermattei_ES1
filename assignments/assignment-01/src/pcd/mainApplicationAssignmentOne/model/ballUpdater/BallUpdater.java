@@ -25,14 +25,14 @@ public class BallUpdater extends Thread{
         System.out.println(this.getName()+" created!\n- number of balls: "+this.numberOfBallsForUpdater+"\n- index range: "+this.indexFirstBall+" - "+this.indexLastBall);
     }
 
-    private boolean areAllUpdaterBallsDead(final int deadBalls){
+    private boolean areMyBallsDead(final int deadBalls){
         return deadBalls == this.numberOfBallsForUpdater;
     }
 
     private void logicVersionWithFor(){
         var lastUpdateTime = System.currentTimeMillis();
         var numberOfDeadBalls = 0;
-        while(this.monitorGame.isGameInProgress() && !areAllUpdaterBallsDead(numberOfDeadBalls)){
+        while(this.monitorGame.isGameInProgress() && !areMyBallsDead(numberOfDeadBalls)){
             //System.out.println(this.thradNumber+" begin update");
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
             for(this.currentBallIndex=this.indexFirstBall;this.currentBallIndex<=this.indexLastBall;this.currentBallIndex++){
@@ -49,7 +49,7 @@ public class BallUpdater extends Thread{
             this.monitorParallelUpdateBall.timeToStop(this.thradNumber);
             this.monitorParallelUpdateBall.waitForUpdatePhase(this.thradNumber);
         }
-        if(areAllUpdaterBallsDead(numberOfDeadBalls)){
+        if(areMyBallsDead(numberOfDeadBalls)){
             this.monitorParallelUpdateBall.timeToStopPermanent(this.thradNumber);
             System.out.println(this.getName()+": "+numberOfDeadBalls+"/"+this.numberOfBallsForUpdater+" dead -->early shutting down");
         }else{

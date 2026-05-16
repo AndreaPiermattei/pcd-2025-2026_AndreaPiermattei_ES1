@@ -43,7 +43,7 @@ public class MainLoop extends Thread{
 
         final var numberOfBallUpdaters = (lessBallsThanProcessors ?
                                             numberOfBallsOnBoard : 
-                                            numberOfProcessors);
+                                            numberOfProcessors-1);
         final var sizeBallListForThread = (lessBallsThanProcessors ?
                                             1 : 
                                             (numberOfBallsOnBoard/(numberOfBallUpdaters))+1);
@@ -121,8 +121,8 @@ public class MainLoop extends Thread{
         System.out.println("\nBEGIN GAME\n");
         while(monitorGame.isGameInProgress()){
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
-			lastUpdateTime = System.currentTimeMillis();		
-            try {
+            lastUpdateTime = System.currentTimeMillis();
+            try {	
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
                     //log("new cmd fetched:");
@@ -143,6 +143,7 @@ public class MainLoop extends Thread{
             //player ball doesn't need any monitor since
             //  only mainthreads modifies the ball
             this.board.updateHumanBall(elapsed);
+				
 
             /*the passive balls on 
             board have been updated, 

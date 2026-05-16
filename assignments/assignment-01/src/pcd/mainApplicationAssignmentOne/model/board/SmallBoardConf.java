@@ -16,7 +16,7 @@ public class SmallBoardConf extends LargeBoardConf{
         var balls = new ArrayList<Ball>();
 
     	for (int row = 0; row < 3; row++) {
-    		for (int col = 0; col < 10; col++) {
+    		for (int col = 0; col < 11; col++) {
         		var px = -0.25 + col*0.025;
         		var py =  row*0.025;
         		var b = new Ball(new P2d(px, py), ballRadius, 0.25, new V2d(0,0),Optional.empty());

@@ -26,7 +26,7 @@ public class MainLoopWithTask{
 	private ExecutorService executor;
 
     private BoundedBuffer<Cmd> bufferInputCommands;
-    Random rand = new Random(6969420);
+    //Random rand = new Random(6969420);
     private final Board board = new Board();
     private MonitorUpdateBallsTask monitorBalls;
     private MonitorGameState monitorGame;
@@ -37,7 +37,7 @@ public class MainLoopWithTask{
     public void initializeGame(){
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
-        this.board.init("S");
+        this.board.init("L");
         this.monitorBalls = new MonitorUpdateBallsTaskImpl(board, numTasks);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAIImpl(board);

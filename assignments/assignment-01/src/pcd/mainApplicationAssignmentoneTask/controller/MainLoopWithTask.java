@@ -17,7 +17,7 @@ import pcd.mainApplicationAssignmentOne.model.monitors.MonitorBallOfAIImpl;
 import pcd.mainApplicationAssignmentOne.model.monitors.MonitorGameStateImpl;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBuffer;
 import pcd.mainApplicationAssignmentOne.util.buffer.BoundedBufferPollImpl;
-
+import pcd.mainApplicationAssignmentoneTask.tasks.CollisionCheckTask;
 import pcd.mainApplicationAssignmentoneTask.tasks.MonitorUpdateBallsTask;
 import pcd.mainApplicationAssignmentoneTask.tasks.MonitorUpdateBallsTaskImpl;
 import pcd.mainApplicationAssignmentoneTask.tasks.UpdateBallTask;
@@ -40,7 +40,7 @@ public class MainLoopWithTask{
     public void initializeGame(){
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
-        this.board.init("L");
+        this.board.init("M");
         this.monitorBalls = new MonitorUpdateBallsTaskImpl(board, numTasks);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAIImpl(board);
@@ -162,7 +162,8 @@ public class MainLoopWithTask{
             to check the collisions 
             sequentially */
             if(this.monitorBalls.areAllUpdatersDone()){
-                this.board.updateStateCollisions(); 
+                //this.board.updateStateCollisions(); 
+                executor.execute(new CollisionCheckTask(monitorBalls));
                 this.board.updateScores();
             }
             

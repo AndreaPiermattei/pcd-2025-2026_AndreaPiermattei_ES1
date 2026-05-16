@@ -31,6 +31,44 @@ public class MainLoop extends Thread{
     private final ViewModel viewModel = new ViewModel();
 	private final View view = new View(viewModel, 1200, 800, this);
 
+    private List<Thread> createBallUpdatersV2(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameState monitorGame){
+        
+        final var numberOfProcessors = Runtime.getRuntime().availableProcessors();
+        final var numberOfBallsOnBoard = board.getBalls().size();
+
+        System.out.println("CREATING BALL UPDATERS...\n - N. processors available: "+numberOfProcessors
+                            +"\n - N. balls on the board: "+numberOfBallsOnBoard+"\n");
+
+        int numberOfBallUpdaters=0;
+        Double ballsPerThread = ((numberOfBallsOnBoard*1.0)/(numberOfProcessors*1.0));
+        
+        final List<Thread> listOfThreads = new ArrayList<>();
+        
+        if(ballsPerThread.compareTo(1.0) <= 0){
+            numberOfBallUpdaters = numberOfBallsOnBoard;
+            for(int i = 0; i < numberOfBallUpdaters; i++){
+                listOfThreads.add(new BallUpdater(i, monitorBalls, monitorGame, i, i));
+            }
+        }else{
+            var integerBallsPerThread = ballsPerThread.intValue()+1;
+            var firstBall = 0;
+            var lastBall = 0;
+            for(int i = 0; i <numberOfProcessors; i++){
+                if(firstBall < numberOfBallsOnBoard){
+                    lastBall = firstBall+integerBallsPerThread-1;
+                    if(lastBall >= numberOfBallsOnBoard){
+                        lastBall = numberOfBallsOnBoard-1;
+                    }
+                    listOfThreads.add(new BallUpdater(i, monitorBalls, monitorGame, firstBall, lastBall));
+                    numberOfBallUpdaters+=1;
+                    firstBall = firstBall+integerBallsPerThread;
+                }
+            }
+        }
+        System.out.println("\nTotal Updaters created: "+numberOfBallUpdaters);
+        return listOfThreads;
+    }
+
     private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameState monitorGame){
        
         final var numberOfProcessors = Runtime.getRuntime().availableProcessors();
@@ -75,7 +113,7 @@ public class MainLoop extends Thread{
         System.out.println("##-----SETTING UP MAIN THREAD-----##");
         this.setName("MAIN THREAD OF GAME");
         this.bufferInputCommands = new BoundedBufferPollImpl<Cmd>(100);
-        this.board.init("S");
+        this.board.init("L");
         this.monitorBalls = new MonitorUpdateBallsSimple(this.board);
         this.monitorGame = new MonitorGameStateImpl();
         this.monitorBallAI = new MonitorBallOfAIImpl(board);
@@ -100,7 +138,7 @@ public class MainLoop extends Thread{
 		var t0 = System.currentTimeMillis();
 		var lastUpdateTime = System.currentTimeMillis();
         try{
-            final var threadsCreated = createBallUpdaters(this.board, this.monitorBalls, this.monitorGame);
+            final var threadsCreated = createBallUpdatersV2(this.board, this.monitorBalls, this.monitorGame);
             this.monitorBalls.createTurnsOfUpdaters(threadsCreated.size());
             launchUpdaters(threadsCreated);
 

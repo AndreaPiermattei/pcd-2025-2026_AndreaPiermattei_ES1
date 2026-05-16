@@ -78,6 +78,10 @@ public class MainLoopWithTask{
 
     }
 
+    private void executeUpdatersV2(){
+
+    }
+
     public void run(){
 
         var debug = false;
@@ -103,7 +107,7 @@ public class MainLoopWithTask{
             try {
 				Optional<Cmd> cmd = bufferInputCommands.poll();
                 if(cmd.isPresent()){
-                    System.out.println("comm rec");
+                    //System.out.println("comm rec");
                     cmd.get().execute(board);
                 }
 			} catch (Exception ex) {
@@ -134,7 +138,7 @@ public class MainLoopWithTask{
             
             /*render */
 			if(this.monitorBalls.areAllUpdatersDone()){
-                System.out.println("Draw");
+                //System.out.println("Draw");
                 nFrames++;
                 int framePerSec = 0;
                 long dt = (System.currentTimeMillis() - t0);

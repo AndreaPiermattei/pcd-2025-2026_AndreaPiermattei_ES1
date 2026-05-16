@@ -69,6 +69,7 @@ public class MainLoop extends Thread{
         return listOfThreads;
     }
 
+    @Deprecated
     private List<Thread> createBallUpdaters(final Board board, final MonitorUpdateBalls monitorBalls, final MonitorGameState monitorGame){
        
         final var numberOfProcessors = Runtime.getRuntime().availableProcessors();
